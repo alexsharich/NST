@@ -9,10 +9,11 @@ export class UsersRepository {
     }
 
     async findById(id: string): Promise<UserDocument | null> {
+
         return this.UserModel.findOne({
             _id: id,
             deletedAt: null,
-        });
+        }).exec();
     }
 
     async save(user: UserDocument) {
