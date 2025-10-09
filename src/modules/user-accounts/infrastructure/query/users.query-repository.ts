@@ -2,10 +2,9 @@ import {User, UserModelType} from '../../domain/user.entity';
 import {InjectModel} from '@nestjs/mongoose';
 import {UserViewDto} from '../../api/view-dto/users.view-dto';
 import {Injectable, NotFoundException} from '@nestjs/common';
-
-import {FilterQuery} from 'mongoose';
-import {PaginatedViewDto} from '../../../../core/dto/base.paginated.view-dto';
-import {GetUsersQueryParams} from '../../api/input-dto/get-users-query-params.input-dto';
+import {GetUsersQueryParams} from "../../api/input-dto/get-users-query-params.input-dto";
+import {PaginatedViewDto} from "../../../../core/dto/base.paginated.view-dto";
+import {FilterQuery} from "mongoose";
 
 @Injectable()
 export class UsersQueryRepository {
@@ -16,53 +15,32 @@ export class UsersQueryRepository {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
-        const user = await this.UserModel.findOne({
-            _id: id,
-            deletedAt: null,
-        }).exec();
-
+        const user = await this.UserModel.findById(id)
         if (!user) {
-            throw new NotFoundException('user not found');
+            throw new NotFoundException('User not found')//404
         }
-
-        return UserViewDto.mapToView(user);
+        return UserViewDto.mapToView(user)
     }
 
-    async getAll(
-        query: GetUsersQueryParams,
-    ): Promise<PaginatedViewDto<UserViewDto[]>> {
+    async getAll(queries: GetUsersQueryParams) {
         const filter: FilterQuery<User> = {
             deletedAt: null,
         };
 
-        if (query.searchLoginTerm) {
-            filter.$or = filter.$or || [];
-            filter.$or.push({
-                login: {$regex: query.searchLoginTerm, $options: 'i'},
-            });
-        }
-
-        if (query.searchEmailTerm) {
-            filter.$or = filter.$or || [];
-            filter.$or.push({
-                email: {$regex: query.searchEmailTerm, $options: 'i'},
-            });
-        }
-
-        const users = await this.UserModel.find(filter)
-            .sort({[query.sortBy]: query.sortDirection})
-            .skip(query.calculateSkip())
-            .limit(query.pageSize);
+        const users = await this.UserModel
+            .find(filter)
+            .sort({[queries.sortBy]: queries.sortDirection})
+            .skip(queries.calculateSkip())
+            .limit(queries.pageSize);
 
         const totalCount = await this.UserModel.countDocuments(filter);
 
         const items = users.map(UserViewDto.mapToView);
-
         return PaginatedViewDto.mapToView({
             items,
             totalCount,
-            page: query.pageNumber,
-            size: query.pageSize,
+            page: queries.pageNumber,
+            size: queries.pageSize,
         });
     }
 }

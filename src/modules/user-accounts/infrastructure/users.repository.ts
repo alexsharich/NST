@@ -1,33 +1,18 @@
-import {InjectModel} from '@nestjs/mongoose';
-import {User, UserDocument, UserModelType} from '../domain/user.entity';
-import {Injectable, NotFoundException} from '@nestjs/common';
+
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from "@nestjs/mongoose";
+import {User, UserDocument, UserModelType} from "../domain/user.entity";
 
 @Injectable()
 export class UsersRepository {
-    //инжектирование модели через DI
-    constructor(@InjectModel(User.name) private UserModel: UserModelType) {
+    constructor(  @InjectModel(User.name) private readonly userModel:UserModelType){
+
     }
-
-    async findById(id: string): Promise<UserDocument | null> {
-
-        return this.UserModel.findOne({
-            _id: id,
-            deletedAt: null,
-        }).exec();
+    async save(user:UserDocument){
+        await user.save()
+        return user._id.toString()
     }
-
-    async save(user: UserDocument) {
-        await user.save();
-    }
-
-    async findOrNotFoundFail(id: string): Promise<UserDocument> {
-        const user = await this.findById(id);
-
-        if (!user) {
-            //TODO: replace with domain exception
-            throw new NotFoundException('user not found');
-        }
-
-        return user;
+    async findOne(id:string){
+       return this.userModel.findOne({_id:id,deletedAt:null})
     }
 }
