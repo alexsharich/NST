@@ -16,17 +16,17 @@ export class UsersController {
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
-    @Delete()
+    @Delete(':id')
     async deletePost(@Param('id') id: string) {
         await this.postsService.deletePost(id)
     }
 
-    @Put()
+    @Put(':id')
     async updatePost(@Param('id') id: string, @Body() updatePostInputDto: UpdatePostInputDto) {
         await this.postsService.updatePost(id, updatePostInputDto)
     }
 
-    @Get()
+    @Get(':id')
     async getPost(@Param('id') id: string) {
 
     }
@@ -36,8 +36,8 @@ export class UsersController {
 
     }
 
-    @Get()
-    async getCommentsForPost(@Param(':postId/comments') postId: string, queries: GetPostQueryParams) {
+    @Get(':postId/comments')
+    async getCommentsForPost(@Param('postId') postId: string, queries: GetPostQueryParams) {
 
     }
 }

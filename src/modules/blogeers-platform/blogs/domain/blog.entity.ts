@@ -24,6 +24,9 @@ export class Blog {
     createdAt: Date;
     updatedAt: Date;
 
+    @Prop({type: Boolean, default: true})
+    isMembership: boolean
+
 
     @Prop({type: Date, nullable: true})
     deletedAt: Date | null;
@@ -51,9 +54,10 @@ export class Blog {
         this.deletedAt = new Date();
     }
 
-
-    update(dto: UpdateBlogInputDto) {
-
+    update({name, websiteUrl, description}: UpdateBlogInputDto) {
+        this.name = name
+        this.description = description
+        this.websiteUrl = websiteUrl
     }
 }
 

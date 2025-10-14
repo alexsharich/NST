@@ -1,6 +1,6 @@
 import {InjectModel} from '@nestjs/mongoose';
 import {Injectable, NotFoundException} from '@nestjs/common';
-import {PaginatedViewDto} from "../../../../core/dto/base.paginated.view-dto";
+import {PaginatedViewDto} from "../../../../../core/dto/base.paginated.view-dto";
 import {FilterQuery} from "mongoose";
 import {Blog, BlogModelType} from "../../domain/blog.entity";
 import {BlogViewDto} from "../../api/view-dto/blog.view-dto";
@@ -16,7 +16,7 @@ export class BlogsQueryRepository {
     async getByIdOrNotFoundFail(id: string): Promise<BlogViewDto> {
         const blog = await this.BlogModel.findById(id)
         if (!blog) {
-            throw new NotFoundException('Blog not found')//404
+            throw new NotFoundException('Blog not found')
         }
         return BlogViewDto.mapToView(blog)
     }

@@ -4,7 +4,6 @@ import {BlogsService} from "../application/blogs.service";
 import {UpdateBlogInputDto} from "./input-dto/update-blog.input-dto";
 import {BlogsQueryRepository} from "../infrastructure/query/blogs.query-repository";
 import {GetBlogsQueryParams} from "./input-dto/get-blogs-query-params.input-dto";
-import {GetUsersQueryParams} from "../../user-accounts/api/input-dto/get-users-query-params.input-dto";
 import {CreatePostForSelectedBlogInputDto} from "./input-dto/create-post-for-blog.input-dto";
 
 
@@ -16,24 +15,26 @@ export class BlogsController {
     @Post()
     async createBlog(@Body() createBlogInputDto: CreateBlogInputDto) {
         const blogId = await this.blogsService.createBlog(createBlogInputDto)
-        //return this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
-
+        console.log(blogId)
+        return this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
-    @Delete()
+    @Delete(':id')
     async deleteBlog(@Param('id') id: string) {
         await this.blogsService.deleteBlog(id)
     }
 
-    @Put()
-    async updateBlog(@Param('id') id: string, @Body() updateBlogInputDto: UpdateBlogInputDto) {//todo match with createBlogDto
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Put(':id')
+    async updateBlog(@Param('id') id: string, @Body() updateBlogInputDto: UpdateBlogInputDto) {
         await this.blogsService.updateBlog(id, updateBlogInputDto)
     }
 
-    @Get()
+    @HttpCode(HttpStatus.OK)
+    @Get(':id')
     async getBlog(@Param('id') id: string) {
-        await this.blogsQueryRepository.getByIdOrNotFoundFail(id)//или напрямую через квери репо
+        await this.blogsQueryRepository.getByIdOrNotFoundFail(id)
     }
 
     @Get()
@@ -41,13 +42,13 @@ export class BlogsController {
         await this.blogsQueryRepository.getAll(queries)
     }
 
-    @Get()
-    async getPostsForBlog(@Param(':blogId/posts') blogId: string, queries: GetBlogsQueryParams) {
+    @Get(':blogId/posts')
+    async getPostsForBlog(@Param('blogId') blogId: string, @Query() queries: GetBlogsQueryParams) {
 
     }
 
-    @Post()
-    async createPost(@Param(':blogId/posts') blogId: string, @Body() createPostForBlogInputDto: CreatePostForSelectedBlogInputDto) {
+    @Post(':blogId/posts')
+    async createPost(@Param('blogId') blogId: string, @Body() createPostForBlogInputDto: CreatePostForSelectedBlogInputDto) {
         const blog = await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
 
     }

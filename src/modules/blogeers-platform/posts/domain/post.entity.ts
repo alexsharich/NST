@@ -45,6 +45,7 @@ export class Post {
         post.content = dto.content
         post.shortDescription = dto.shortDescription
         post.title = dto.title
+        post.blogId = dto.blogId
 
         return post as PostDocument;
     }
