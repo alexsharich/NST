@@ -6,13 +6,13 @@ import {PostsService} from "../application/posts.service";
 import {PostsQueryRepository} from "../infrastructure/query/posts-query-repository";
 
 @Controller('posts')
-export class UsersController {
+export class PostsController {
     constructor(private readonly postsService: PostsService, private readonly postsQueryRepository: PostsQueryRepository) {
     }
 
     @Post()
     async createPost(@Body() createPostInputDto: CreatePostInputDto) {
-        await this.postsService.createPost(createPostInputDto)
+        return this.postsService.createPost(createPostInputDto)
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -21,6 +21,7 @@ export class UsersController {
         await this.postsService.deletePost(id)
     }
 
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':id')
     async updatePost(@Param('id') id: string, @Body() updatePostInputDto: UpdatePostInputDto) {
         await this.postsService.updatePost(id, updatePostInputDto)
@@ -28,12 +29,13 @@ export class UsersController {
 
     @Get(':id')
     async getPost(@Param('id') id: string) {
-
+        return this.postsQueryRepository.getByIdOrNotFoundFail(id)
     }
 
+    @HttpCode(HttpStatus.OK)
     @Get()
-    async getAll() {
-
+    async getAll(@Query() queries: GetPostQueryParams) {
+        return this.postsQueryRepository.getAll(queries)
     }
 
     @Get(':postId/comments')

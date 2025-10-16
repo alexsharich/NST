@@ -15,7 +15,7 @@ export class UsersQueryRepository {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
-        const user = await this.UserModel.findById(id)
+        const user = await this.UserModel.findOne({_id: id, deletedAt: null})
         if (!user) {
             throw new NotFoundException('User not found')//404
         }
@@ -26,6 +26,19 @@ export class UsersQueryRepository {
         const filter: FilterQuery<User> = {
             deletedAt: null,
         };
+        if (queries.searchLoginTerm) {
+            filter.$or = filter.$or || [];
+            filter.$or.push({
+                login: {$regex: queries.searchLoginTerm, $options: 'i'},
+            });
+        }
+
+        if (queries.searchEmailTerm) {
+            filter.$or = filter.$or || [];
+            filter.$or.push({
+                email: {$regex: queries.searchEmailTerm, $options: 'i'},
+            });
+        }
 
         const users = await this.UserModel
             .find(filter)

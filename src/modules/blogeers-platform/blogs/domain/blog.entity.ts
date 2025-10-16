@@ -24,7 +24,7 @@ export class Blog {
     createdAt: Date;
     updatedAt: Date;
 
-    @Prop({type: Boolean, default: true})
+    @Prop({type: Boolean, default: false})
     isMembership: boolean
 
 
@@ -48,9 +48,6 @@ export class Blog {
 
 
     makeDeleted() {
-        if (this.deletedAt !== null) {
-            throw new Error('Entity already deleted');
-        }
         this.deletedAt = new Date();
     }
 

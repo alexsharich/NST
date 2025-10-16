@@ -46,21 +46,22 @@ export class Post {
         post.shortDescription = dto.shortDescription
         post.title = dto.title
         post.blogId = dto.blogId
+        post.blogName = dto.blogName
 
         return post as PostDocument;
     }
 
 
     makeDeleted() {
-        if (this.deletedAt !== null) {
-            throw new Error('Entity already deleted');
-        }
         this.deletedAt = new Date();
     }
 
 
-    update(dto: UpdatePostInputDto) {
-
+    update({content, shortDescription, title, blogId}: UpdatePostInputDto) {
+        this.blogId = blogId
+        this.shortDescription = shortDescription
+        this.title = title
+        this.content = content
     }
 }
 

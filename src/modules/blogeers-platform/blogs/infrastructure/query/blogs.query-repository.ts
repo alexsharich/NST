@@ -14,7 +14,7 @@ export class BlogsQueryRepository {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<BlogViewDto> {
-        const blog = await this.BlogModel.findById(id)
+        const blog = await this.BlogModel.findOne({_id: id, deletedAt: null})
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
@@ -25,8 +25,11 @@ export class BlogsQueryRepository {
         const filter: FilterQuery<Blog> = {
             deletedAt: null,
         };
+        if (queries.searchNameTerm) {
+            filter.name = {$regex: queries.searchNameTerm, $options: 'i'}
+        }
 
-        const users = await this.BlogModel
+        const blogs = await this.BlogModel
             .find(filter)
             .sort({[queries.sortBy]: queries.sortDirection})
             .skip(queries.calculateSkip())
@@ -34,7 +37,7 @@ export class BlogsQueryRepository {
 
         const totalCount = await this.BlogModel.countDocuments(filter);
 
-        const items = users.map(BlogViewDto.mapToView);
+        const items = blogs.map(BlogViewDto.mapToView);
         return PaginatedViewDto.mapToView({
             items,
             totalCount,

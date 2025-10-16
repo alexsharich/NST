@@ -34,22 +34,23 @@ export class BlogsController {
     @HttpCode(HttpStatus.OK)
     @Get(':id')
     async getBlog(@Param('id') id: string) {
-        await this.blogsQueryRepository.getByIdOrNotFoundFail(id)
+        return this.blogsQueryRepository.getByIdOrNotFoundFail(id)
     }
 
+    @HttpCode(HttpStatus.OK)
     @Get()
     async getAllBlogs(@Query() queries: GetBlogsQueryParams) {
-        await this.blogsQueryRepository.getAll(queries)
+        return this.blogsQueryRepository.getAll(queries)
     }
 
+    @HttpCode(HttpStatus.OK)
     @Get(':blogId/posts')
     async getPostsForBlog(@Param('blogId') blogId: string, @Query() queries: GetBlogsQueryParams) {
-
+        return this.blogsService.getAllForPost(blogId, queries)
     }
 
     @Post(':blogId/posts')
     async createPost(@Param('blogId') blogId: string, @Body() createPostForBlogInputDto: CreatePostForSelectedBlogInputDto) {
-        const blog = await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
-
+        return this.blogsService.cratePostForBlog(blogId, createPostForBlogInputDto)
     }
 }

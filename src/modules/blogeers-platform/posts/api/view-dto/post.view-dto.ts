@@ -11,22 +11,28 @@ export class PostViewDto {
     blogName: string
     createdAt: Date
     extendedLikesInfo: {
-        likesCount: 0
-        dislikesCount: 0
+        likesCount: number
+        dislikesCount: number
         myStatus: "None"
-        newestLikes: [
-            {
-                addedAt: string
-                userId: string
-                login: string
-            }
-        ]
+        newestLikes: []
 
     }
 
-    static mapToView(user: PostDocument): PostViewDto {
+    static mapToView(post: PostDocument): PostViewDto {
         const dto = new PostViewDto();
-
+        dto.id = post._id.toString()
+        dto.blogId = post.blogId
+        dto.blogName = post.blogName
+        dto.title = post.title
+        dto.shortDescription = post.shortDescription
+        dto.content = post.content
+        dto.createdAt = post.createdAt
+        dto.extendedLikesInfo = {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: "None",
+            newestLikes: []
+        }
 
         return dto;
     }

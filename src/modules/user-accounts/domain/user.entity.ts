@@ -1,31 +1,31 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { UpdateUserDto } from '../dto/create-user.dto';
-import { CreateUserDomainDto } from './dto/create-user.domain.dto';
+import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
+import {HydratedDocument, Model} from 'mongoose';
+import {UpdateUserDto} from '../dto/create-user.dto';
+import {CreateUserDomainDto} from './dto/create-user.domain.dto';
 
 
-@Schema({ timestamps: true })
+@Schema({timestamps: true})
 export class User {
-    @Prop({ type: String, required: true })
+    @Prop({type: String, required: true})
     login: string;
 
-    @Prop({ type: String, required: true })
+    @Prop({type: String, required: true})
     passwordHash: string;
 
 
-    @Prop({ type: String, min: 5, required: true })
+    @Prop({type: String, min: 5, required: true})
     email: string;
 
 
-  /*  @Prop({ type: Boolean, required: true, default: false })
-    isEmailConfirmed: boolean;*/
+    /*  @Prop({ type: Boolean, required: true, default: false })
+      isEmailConfirmed: boolean;*/
 
 
     createdAt: Date;
     updatedAt: Date;
 
 
-    @Prop({ type: Date, nullable: true })
+    @Prop({type: Date, nullable: true})
     deletedAt: Date | null;
 
 
@@ -40,22 +40,16 @@ export class User {
         user.passwordHash = dto.passwordHash;
         user.login = dto.login;
         //user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
-
         return user as UserDocument;
     }
 
-
     makeDeleted() {
-        if (this.deletedAt !== null) {
-            throw new Error('Entity already deleted');
-        }
         this.deletedAt = new Date();
     }
 
-
     update(dto: UpdateUserDto) {
         if (dto.email !== this.email) {
-           // this.isEmailConfirmed = false;
+            // this.isEmailConfirmed = false;
             this.email = dto.email;
         }
     }
