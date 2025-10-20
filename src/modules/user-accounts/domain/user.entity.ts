@@ -3,6 +3,19 @@ import {HydratedDocument, Model} from 'mongoose';
 import {UpdateUserDto} from '../dto/create-user.dto';
 import {CreateUserDomainDto} from './dto/create-user.domain.dto';
 
+export const loginConstraints = {
+    minLength: 3,
+    maxLength: 10,
+};
+
+export const passwordConstraints = {
+    minLength: 6,
+    maxLength: 20,
+};
+export const emailConstraints = {
+    match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+};
+
 
 @Schema({timestamps: true})
 export class User {
