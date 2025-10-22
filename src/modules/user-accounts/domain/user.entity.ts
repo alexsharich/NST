@@ -1,6 +1,6 @@
 import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
-import {UpdateUserDto} from '../dto/create-user.dto';
+import {ChangePassword, UpdateUserDto} from '../dto/create-user.dto';
 import {CreateUserDomainDto} from './dto/create-user.domain.dto';
 
 export const loginConstraints = {
@@ -30,8 +30,8 @@ export class User {
     email: string;
 
 
-    /*  @Prop({ type: Boolean, required: true, default: false })
-      isEmailConfirmed: boolean;*/
+    @Prop({type: Boolean, required: true, default: false})
+    isEmailConfirmed: boolean
 
 
     createdAt: Date;
@@ -52,7 +52,7 @@ export class User {
         user.email = dto.email;
         user.passwordHash = dto.passwordHash;
         user.login = dto.login;
-        //user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
+        user.isEmailConfirmed = false;
         return user as UserDocument;
     }
 
@@ -62,8 +62,16 @@ export class User {
 
     update(dto: UpdateUserDto) {
         if (dto.email !== this.email) {
-            // this.isEmailConfirmed = false;
+            this.isEmailConfirmed = false;
             this.email = dto.email;
+        }
+        //change this.isEmailConfirmed = true
+    }
+
+
+    changePassword(dto: ChangePassword) {
+        if (dto.passwordHash !== this.passwordHash) {
+            this.passwordHash = dto.passwordHash
         }
     }
 }

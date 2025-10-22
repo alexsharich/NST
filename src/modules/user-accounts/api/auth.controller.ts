@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards} from '@nestjs/common';
 import {PasswordRecoveryType} from "./input-dto/password-recovery-dto";
 import {NewPasswordType} from "./input-dto/new-password";
 import {RegistrationConfirmationCode} from "./input-dto/registration-confirmation-code";
@@ -6,6 +6,7 @@ import {RegistrationEmailResending} from "./input-dto/registration-email-resendi
 import {CreateUserInputDto} from "./input-dto/users.input-dto";
 import {AuthService} from "../application/auth.service";
 import {Login} from "./input-dto/login";
+import {AuthGuard} from "../../../core/guards/auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -22,31 +23,33 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() body: Login) {
-        
-
+        return this.authService.login(body)
     }
 
     @Post('password-recovery')
-    passwordRecovery(@Body() body: PasswordRecoveryType) {
+    async passwordRecovery(@Body() body: PasswordRecoveryType) {
 
     }
 
     @Post('new-password')
-    newPassword(@Body() body: NewPasswordType) {
+    async newPassword(@Body() body: NewPasswordType) {
+        await this.authService.newPassword(body)
     }
 
     @Post('registration-confirmation')
-    registrationConfirmation(@Body() code: RegistrationConfirmationCode) {
+    async registrationConfirmation(@Body() code: RegistrationConfirmationCode) {
+
     }
 
     @Post('registration-email-resending')
-    registrationEmailResending(@Body() body: RegistrationEmailResending) {
+    async registrationEmailResending(@Body() body: RegistrationEmailResending) {
 
     }
 
+    @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.OK)
     @Get('me')
-    me() {
-
+    async me(@Req() req: Request) {
+        return this.authService.me(req)
     }
 }

@@ -24,6 +24,7 @@ export class UsersQueryRepository {
         return UserViewDto.mapToView(user)
     }
 
+
     async getAll(queries: GetUsersQueryParams) {
         const filter: FilterQuery<User> = {
             deletedAt: null,

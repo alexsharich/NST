@@ -1,4 +1,4 @@
-import {IsEmail, IsString, Length, Matches} from "class-validator";
+import {IsEmail, IsString, Matches} from "class-validator";
 import {emailConstraints, loginConstraints, passwordConstraints} from "../../domain/user.entity";
 import {Trim} from "../../../../core/decorators/transform/trim";
 import {IsStringWithTrim} from "../../../../core/decorators/validation/is-string-with-string";

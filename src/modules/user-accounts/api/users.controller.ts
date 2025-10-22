@@ -3,10 +3,8 @@ import {UsersService} from "../application/users.service";
 import {CreateUserInputDto} from "./input-dto/users.input-dto";
 import {UsersQueryRepository} from "../infrastructure/query/users.query-repository";
 import {GetUsersQueryParams} from "./input-dto/get-users-query-params.input-dto";
-import {AuthGuard} from "../../../auth.guard";
 import {BasicGuard} from "../../../core/guards/basic.guard";
 
-//@UseGuards(AuthGuard)
 @UseGuards(BasicGuard)
 @Controller('users')
 export class UsersController {
