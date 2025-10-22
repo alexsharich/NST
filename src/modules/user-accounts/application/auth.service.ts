@@ -9,7 +9,8 @@ import {JwtService} from "../../../application/jwt.service";
 import {Login} from "../api/input-dto/login";
 import {UsersQueryRepository} from "../infrastructure/query/users.query-repository";
 import {NewPasswordType} from "../api/input-dto/new-password";
-import {UserMeViewDto} from "../api/view-dto/users-me.view-dto";
+import {UserViewDto} from "../api/view-dto/users.view-dto";
+import {RegistrationConfirmationCode} from "../api/input-dto/registration-confirmation-code";
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,19 @@ export class AuthService {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt)
         const newUser = this.userModel.createInstance({login, passwordHash, email})
-        await this.usersRepository.save(newUser)
+        await this.usersRepository.save(newUser) ///отправить письмо
+    }
+
+    async registrationConfirmation(code: RegistrationConfirmationCode) {
+        const user = await this.usersRepository.findUserByConfirmationCode(code)
+        if (!user) {
+            throw new DomainException({
+                code: DomainExceptionCode.BadRequest,
+                message: 'Confirmation code is incorrect, expired or already been applied'
+            })
+        }//проверка на exp / exp при регистрации
+        user.setIsConfirmed()
+        await this.usersRepository.save(user)
     }
 
     async login({loginOrEmail, password}: Login): Promise<string> {
@@ -42,17 +55,20 @@ export class AuthService {
                 message: 'Password or login or email is wrong'
             })
         }
+        const isCompare = await bcrypt.compare(password, user.passwordHash)
+        if (!isCompare) {
+            throw new DomainException({
+                code: DomainExceptionCode.Unauthorized,
+                message: 'Password or login or email is wrong'
+            })
+        }
         const {accessToken} = await this.jwtService.createToken(user.id)
         return accessToken
     }
 
-    async me(request: Request): Promise<UserMeViewDto> {
-        const userId = request['userId']
-        if (!userId) {
-            throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
-        }
-        const user = await this.usersQueryRepository.getByIdOrNotFoundFail(userId) //with createdAt
-        return UserMeViewDto.mapToView(user)//TODO перемапил ???
+    async me(userId: string): Promise<Omit<UserViewDto, 'createdAt'>> {
+        const {createdAt, ...rest} = await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
+        return rest
     }
 
     async newPassword({newPassword, recoveryCode}: NewPasswordType) {
@@ -60,10 +76,9 @@ export class AuthService {
         if (!user) {
             throw new DomainException({code: DomainExceptionCode.NotFound, message: 'User not found'})
         }
-        const salt = await bcrypt.genSalt(7)//TODO magic number .env
+        const salt = await bcrypt.genSalt(7)
         const passwordHash = await bcrypt.hash(newPassword, salt)
-        //const currentUser  = await this.userModel.changePassword(passwordHash)
-        //await this.usersRepository.save(currentUser)
+        user.changePassword(passwordHash)
+        await this.usersRepository.save(user)
     }
-
 }

@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
         if (!payload) {
             throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
         }
-        request['userId'] = payload!.userId
+        request.userId = payload!.userId
         return true
     }
 }

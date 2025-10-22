@@ -1,8 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument, UserModelType} from "../domain/user.entity";
-import {DomainException} from "../../../core/exceptions/domain-exceptions";
-import {DomainExceptionCode} from "../../../core/exceptions/domain-exceptions-codes";
+import {RegistrationConfirmationCode} from "../api/input-dto/registration-confirmation-code";
 
 @Injectable()
 export class UsersRepository {
@@ -22,7 +21,12 @@ export class UsersRepository {
     async findUserByLoginOrEmail({login, email}: { login: string, email: string }) {
         return this.userModel.findOne({$or: [{login}, {email}], deletedAt: null})
     }
-    async findUserByRecoveryCode(recoveryCode:string){
+
+    async findUserByConfirmationCode(confirmationCode: RegistrationConfirmationCode) {
+        return this.userModel.findOne({'emailConfirmation.confirmationCode': confirmationCode})
+    }
+
+    async findUserByRecoveryCode(recoveryCode: RegistrationConfirmationCode) {
         return this.userModel.findOne({recoveryCode})
     }
 

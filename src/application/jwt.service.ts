@@ -1,4 +1,5 @@
 import jwt, {JwtPayload} from 'jsonwebtoken'
+import {ConfigService} from "@nestjs/config";
 
 
 interface MyJwtPayload extends JwtPayload {
@@ -7,9 +8,15 @@ interface MyJwtPayload extends JwtPayload {
 }
 
 export class JwtService {
+    constructor(private readonly configService: ConfigService) {
+    }
+
     createToken(userId: string, deviceId?: string) {
-        const accessToken = jwt.sign({userId}, process.env.JWT_ACCESS, {expiresIn: '300s'})
-        const refreshToken = jwt.sign({userId, deviceId}, process.env.JWT_REFRESH, {expiresIn: '600s'})
+        const accessToken = jwt.sign({userId}, this.configService.getOrThrow<string>('JWT_ACCESS'), {expiresIn: '300s'})
+        const refreshToken = jwt.sign({
+            userId,
+            deviceId
+        }, this.configService.getOrThrow<string>('JWT_REFRESH'), {expiresIn: '600s'})
         return {accessToken, refreshToken}
     }
 

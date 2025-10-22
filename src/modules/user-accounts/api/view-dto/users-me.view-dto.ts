@@ -1,4 +1,3 @@
-import {UserDocument} from '../../domain/user.entity';
 import {UserViewDto} from "./users.view-dto";
 
 export class UserMeViewDto {

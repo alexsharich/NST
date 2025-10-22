@@ -12,6 +12,3 @@ export class UpdateUserIsConfirmed {
     isConfirmed: boolean
 }
 
-export class ChangePassword {
-    passwordHash: string
-}

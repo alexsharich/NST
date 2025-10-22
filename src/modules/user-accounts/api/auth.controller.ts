@@ -7,6 +7,7 @@ import {CreateUserInputDto} from "./input-dto/users.input-dto";
 import {AuthService} from "../application/auth.service";
 import {Login} from "./input-dto/login";
 import {AuthGuard} from "../../../core/guards/auth.guard";
+import {Request} from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -38,7 +39,7 @@ export class AuthController {
 
     @Post('registration-confirmation')
     async registrationConfirmation(@Body() code: RegistrationConfirmationCode) {
-
+        await this.authService.registrationConfirmation(code)
     }
 
     @Post('registration-email-resending')
@@ -50,6 +51,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Get('me')
     async me(@Req() req: Request) {
-        return this.authService.me(req)
+        const userId = req.userId!
+        return this.authService.me(userId)
     }
 }
