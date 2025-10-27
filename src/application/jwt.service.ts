@@ -31,7 +31,7 @@ export class JwtService {
 
     verifyRefreshToken(token: string) {
         try {
-            return <MyJwtPayload>jwt.verify(token, process.env.JWT_REFRESH)
+            return <MyJwtPayload>jwt.verify(token, this.configService.getOrThrow<string | null>('JWT_REFRESH'))
         } catch (error) {
             return null
         }
@@ -39,7 +39,7 @@ export class JwtService {
 
     verifyToken(token: string) {
         try {
-            return <MyJwtPayload>jwt.verify(token, process.env.JWT_ACCESS)
+            return <MyJwtPayload>jwt.verify(token, this.configService.getOrThrow<string | null>('JWT_ACCESS'))
         } catch (error) {
             console.log('ERROR', error)
             return null

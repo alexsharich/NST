@@ -26,7 +26,7 @@ export class UsersRepository {
         return this.userModel.findOne({'emailConfirmation.confirmationCode': confirmationCode})
     }
 
-    async findUserByRecoveryCode(recoveryCode: RegistrationConfirmationCode) {
+    async findUserByRecoveryCode(recoveryCode: string) {
         return this.userModel.findOne({recoveryCode})
     }
 

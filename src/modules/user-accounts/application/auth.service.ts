@@ -43,6 +43,7 @@ export class AuthService {
                 message: 'Confirmation code is incorrect, expired or already been applied'
             })
         }//проверка на exp / exp при регистрации
+
         user.setIsConfirmed()
         await this.usersRepository.save(user)
     }
