@@ -26,7 +26,17 @@ export class EmailConfirmation {
     expirationDate: Date | null;
 }
 
+@Schema()
+export class PasswordRecovery {
+    @Prop({type: String, nullable: true})
+    recoveryCode: string | null;
+
+    @Prop({type: Date, nullable: true})
+    expirationDate: Date | null;
+}
+
 export const ConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
+export const PasswordRecoverySchema = SchemaFactory.createForClass(PasswordRecovery);
 
 @Schema({timestamps: true})
 export class User {
@@ -45,6 +55,9 @@ export class User {
     @Prop({type: ConfirmationSchema, nullable: true})
     emailConfirmation: EmailConfirmation | null;
 
+    @Prop({type: PasswordRecoverySchema, nullable: true})
+    passwordRecovery: PasswordRecovery | null;
+
     @Prop({type: Date, nullable: true})
     deletedAt: Date | null;
 
@@ -52,13 +65,17 @@ export class User {
     updatedAt: Date;
 
 
-    static createInstance(dto: CreateUserDomainDto): UserDocument {
+    static createInstance(dto: CreateUserDomainDto, confirmationCode: string | null, expirationDate: Date | null): UserDocument {
         const user = new this();
         user.email = dto.email;
         user.passwordHash = dto.passwordHash;
         user.login = dto.login;
         user.isEmailConfirmed = false;
-        user.emailConfirmation = null; // Убедитесь, что emailConfirmation инициализируется
+        user.emailConfirmation = {
+            confirmationCode,
+            expirationDate
+        }
+
         return user as UserDocument;
     }
 
@@ -79,6 +96,21 @@ export class User {
     changePassword(passwordHash: string) {
         this.passwordHash = passwordHash;
     }
+
+    updateEmailConfirmationCode(confirmationCode: string, expirationDate: Date) {
+        this.emailConfirmation = {
+            confirmationCode,
+            expirationDate
+        }
+    }
+
+    setPasswordRecovery(recoveryCode: string, expirationDate: Date) {
+        this.passwordRecovery = {
+            recoveryCode,
+            expirationDate
+        }
+    }
+
 
     updateS(obj: Object) {
         const [key, value] = Object.entries(obj)[0];

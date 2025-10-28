@@ -29,7 +29,7 @@ export class AuthController {
 
     @Post('password-recovery')
     async passwordRecovery(@Body() body: PasswordRecoveryType) {
-
+        await this.authService.passwordRecovery(body.email)
     }
 
     @Post('new-password')
@@ -44,7 +44,7 @@ export class AuthController {
 
     @Post('registration-email-resending')
     async registrationEmailResending(@Body() body: RegistrationEmailResending) {
-
+        await this.authService.emailConfirmationCodeResending(body.email)
     }
 
     @UseGuards(AuthGuard)

@@ -3,8 +3,9 @@ import {DomainExceptionCode} from "./domain-exceptions-codes";
 export class Extension {
     constructor(
         public message: string,
-        public key: string,
-    ) {}
+        public field: string,
+    ) {
+    }
 }
 
 export class DomainException extends Error {

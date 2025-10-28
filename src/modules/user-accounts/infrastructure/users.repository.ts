@@ -27,7 +27,7 @@ export class UsersRepository {
     }
 
     async findUserByRecoveryCode(recoveryCode: string) {
-        return this.userModel.findOne({recoveryCode})
+        return this.userModel.findOne({'passwordRecovery.recoveryCode': recoveryCode})
     }
 
 }
