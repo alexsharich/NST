@@ -8,6 +8,7 @@ import {ClearDBModule} from "./modules/blogeers-platform/clearDB/clear-database.
 import {ConfigModule} from '@nestjs/config';
 import {MailerModule} from "@nestjs-modules/mailer";
 import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
+import {MailModule} from "./modules/mail/mail-module";
 
 
 @Module({
@@ -16,19 +17,7 @@ import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars
         BloggersPlatformModule,
         ClearDBModule,
         ConfigModule.forRoot({isGlobal: true}),
-        MailerModule.forRoot({
-            transport: 'smtps://user@domain.com:pass@smtp.domain.com',//TODO add userName password
-            defaults: {
-                from: '"Alexander" <skotch3k2@yandex.ru>',
-            },
-            template: {
-                dir: __dirname + '/templates',
-                adapter: new HandlebarsAdapter(),
-                options: {
-                    strict: true,
-                },
-            },
-        })],
+        MailModule],
     controllers: [AppController],
     providers: [AppService],
 })

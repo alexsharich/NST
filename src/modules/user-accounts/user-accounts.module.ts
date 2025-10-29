@@ -9,13 +9,18 @@ import {SecurityDevicesQueryRepository} from './infrastructure/query/security-de
 import {AuthQueryRepository} from './infrastructure/query/auth.query-repository';
 import {SecurityDevicesController} from './api/security-devices.controller';
 import {UsersRepository} from "./infrastructure/users.repository";
+import {JwtService} from "../../application/jwt.service";
+import {AuthService} from "./application/auth.service";
+import {MailModule} from "../mail/mail-module";
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{name: User.name, schema: UserSchema}]),
+        MongooseModule.forFeature([{name: User.name, schema: UserSchema}]), MailModule
     ],
     controllers: [UsersController, AuthController, SecurityDevicesController],
     providers: [
+        JwtService,
+        AuthService,
         UsersService,
         UsersRepository,
         UsersQueryRepository,

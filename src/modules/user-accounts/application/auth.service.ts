@@ -3,7 +3,7 @@ import {CreateUserInputDto} from "../api/input-dto/users.input-dto";
 import {UsersRepository} from "../infrastructure/users.repository";
 import {DomainException} from "../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../core/exceptions/domain-exceptions-codes";
-import {UserModelType} from "../domain/user.entity";
+import {User, UserModelType} from "../domain/user.entity";
 import bcrypt from "bcrypt";
 import {JwtService} from "../../../application/jwt.service";
 import {Login} from "../api/input-dto/login";
@@ -14,12 +14,13 @@ import {RegistrationConfirmationCode} from "../api/input-dto/registration-confir
 import {Mailer} from "../../mail/application/mail.service";
 import {add} from "date-fns";
 import {randomUUID} from 'crypto'
+import {InjectModel} from "@nestjs/mongoose";
 
 @Injectable()
 export class AuthService {
     constructor(private readonly usersRepository: UsersRepository,
                 private readonly usersQueryRepository: UsersQueryRepository,
-                private readonly userModel: UserModelType,
+                @InjectModel(User.name) private readonly userModel: UserModelType,
                 private readonly jwtService: JwtService,
                 private readonly mailer: Mailer
     ) {

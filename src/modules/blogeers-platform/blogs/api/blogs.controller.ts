@@ -15,7 +15,6 @@ export class BlogsController {
     @Post()
     async createBlog(@Body() createBlogInputDto: CreateBlogInputDto) {
         const blogId = await this.blogsService.createBlog(createBlogInputDto)
-        console.log(blogId)
         return this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
     }
 

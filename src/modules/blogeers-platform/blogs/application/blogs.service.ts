@@ -24,6 +24,7 @@ export class BlogsService {
 
     async createBlog({websiteUrl, description, name}: CreateBlogInputDto): Promise<string> {
         const blog = this.BlogModel.createInstance({websiteUrl, description, name})
+        console.log(blog)
         return this.blogsRepository.save(blog)
     }
 
