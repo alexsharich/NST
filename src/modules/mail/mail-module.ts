@@ -1,6 +1,4 @@
 import {Module} from '@nestjs/common';
-import {AppController} from "../../app.controller";
-import {AppService} from "../../app.service";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {MailerModule} from "@nestjs-modules/mailer";
 import {Mailer} from "./application/mail.service";
@@ -10,18 +8,20 @@ import {Mailer} from "./application/mail.service";
         MailerModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 transport: {
-                    host: 'smtp.yandex.ru',
-                    port: 465,
-                    ignoreTLS: true,
+                    host: configService.getOrThrow<string>('MAIL_HOST'),
+                    port: configService.getOrThrow<number>('MAIL_PORT'),
                     secure: true,
+                    tls: {
+                        rejectUnauthorized: false,
+                    },
                     auth: {
-                        user: configService.getOrThrow('MAIL'),
-                        pass: 'EMAIL_PAS',
+                        user: configService.getOrThrow<string>('MAIL_LOGIN'),
+                        pass: configService.getOrThrow<string>('MAIL_PASS'),
                     },
                 },
                 defaults: {
-                    from: `"Alexander" ${configService.getOrThrow('MAIL')}`,
-                },
+                    from: configService.getOrThrow<string>('MAIL_LOGIN'),
+                }
             }),
             inject: [ConfigService],
             imports: [ConfigModule]

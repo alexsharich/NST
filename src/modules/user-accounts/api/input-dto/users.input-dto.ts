@@ -10,7 +10,6 @@ export class CreateUserInputDto {
     password: string;
     @IsEmail()
     @IsString()
-    @Matches(emailConstraints.match)
     @Trim()
     email: string;
 }

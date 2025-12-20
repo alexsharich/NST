@@ -18,12 +18,20 @@ export class UsersRepository {
         return this.userModel.findOne({_id: id, deletedAt: null})
     }
 
-    async findUserByLoginOrEmail({login, email}: { login: string, email: string }) {
-        return this.userModel.findOne({$or: [{login}, {email}], deletedAt: null})
+    async findUserByLogin(login: string) {
+        return this.userModel.findOne({login, deletedAt: null})
+    }
+
+    async findUserByLoginOrEmail(loginOrEmail:string) {
+        return this.userModel.findOne({$or:[{login:loginOrEmail},{email:loginOrEmail}]})
+    }
+
+    async findUserByEmail(email: string) {
+        return this.userModel.findOne({email, deletedAt: null})
     }
 
     async findUserByConfirmationCode(confirmationCode: RegistrationConfirmationCode) {
-        return this.userModel.findOne({'emailConfirmation.confirmationCode': confirmationCode})
+        return this.userModel.findOne({'emailConfirmation.confirmationCode': confirmationCode.code})
     }
 
     async findUserByRecoveryCode(recoveryCode: string) {

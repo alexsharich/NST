@@ -20,7 +20,7 @@ export const errorFormatter = (
                     message: error.constraints[key]
                         ? `${error.constraints[key]}; Received value: ${error?.value}`
                         : '',
-                    key: error.property,
+                    field: error.property,
                 });
             }
         }
@@ -33,14 +33,13 @@ export function pipesSetup(app: INestApplication) {
     app.useGlobalPipes(
         new ValidationPipe({
             transform: true,
-            whitelist: true,
+            // whitelist: true,
             stopAtFirstError: true,
             exceptionFactory: (errors) => {
                 const formattedErrors = errorFormatter(errors);
 
                 throw new DomainException({
                     code: DomainExceptionCode.ValidationError,
-                    message: 'Validation failed',
                     extensions: formattedErrors,
                 });
             },

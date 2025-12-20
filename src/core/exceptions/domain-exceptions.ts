@@ -15,11 +15,13 @@ export class DomainException extends Error {
 
     constructor(errorInfo: {
         code: DomainExceptionCode;
-        message: string;
+        message?: string;
         extensions?: Extension[];
     }) {
         super(errorInfo.message);
-        this.message = errorInfo.message;
+        if (errorInfo.message) {
+            this.message = errorInfo.message;
+        }
         this.code = errorInfo.code;
         this.extensions = errorInfo.extensions || [];
     }

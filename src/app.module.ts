@@ -6,9 +6,9 @@ import {UserAccountsModule} from "./modules/user-accounts/user-accounts.module";
 import {BloggersPlatformModule} from "./modules/blogeers-platform/bloggers-platform.module";
 import {ClearDBModule} from "./modules/blogeers-platform/clearDB/clear-database.module";
 import {ConfigModule} from '@nestjs/config';
-import {MailerModule} from "@nestjs-modules/mailer";
-import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import {MailModule} from "./modules/mail/mail-module";
+import {APP_FILTER} from "@nestjs/core";
+import {DomainHttpExceptionsFilter} from "./core/exceptions/filters/domain-exeptions-filter";
 
 
 @Module({
@@ -19,7 +19,11 @@ import {MailModule} from "./modules/mail/mail-module";
         ConfigModule.forRoot({isGlobal: true}),
         MailModule],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService,
+        {
+            provide: APP_FILTER,
+            useClass: DomainHttpExceptionsFilter,
+        }],
 })
 export class AppModule {
 }

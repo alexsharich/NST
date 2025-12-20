@@ -28,21 +28,39 @@ export class AuthService {
     }
 
     async registration({login, password, email}: CreateUserInputDto) {
-        const user = await this.usersRepository.findUserByLoginOrEmail({login, email})
-        if (user) {
+        const isLoginExist = await this.usersRepository.findUserByLogin(login)
+        if (isLoginExist) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
-                message: 'Login or email is exist'
+                extensions: [
+                    {message: 'Login is exist', field: 'login'}
+                ]
+            })
+        }
+        const isEmailExist = await this.usersRepository.findUserByEmail(email)
+        if (isEmailExist) {
+            throw new DomainException({
+                code: DomainExceptionCode.BadRequest,
+                extensions: [
+                    {message: 'Email is exist', field: 'email'},
+                ]
             })
         }
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt)
-        const now = new Date()
+        const now = new Date();
+
+        const oneHourLaterMillis = now.getTime() + (60 * 60 * 1000);
+
+        const expirationDate = new Date(oneHourLaterMillis);
         const confirmationCode = randomUUID()
-        const expirationDate = add(now, {hours: 1,})
+        console.log('DATE EXP', expirationDate)
+        console.log('DATE NOW', now)
+        console.log('CODE', confirmationCode)
         const newUser = this.userModel.createInstance({login, passwordHash, email}, confirmationCode, expirationDate)
         await this.usersRepository.save(newUser)
-        await this.mailer.sendEmail(email, 'Registration', 'Please, confirm registration', confirmationCode)
+
+        this.mailer.sendEmail(email, 'Registration', 'Please, confirm registration', confirmationCode)
     }
 
     async registrationConfirmation(code: RegistrationConfirmationCode) {
@@ -50,19 +68,29 @@ export class AuthService {
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
-                message: 'Confirmation code is incorrect, expired or already been applied'
+                extensions: [
+                    {
+                        message: 'Confirmation code already confirmed',
+                        field: 'code'
+                    }
+                ]
             })
         }
-        if (!user.emailConfirmation?.expirationDate) {
+        if (user.isEmailConfirmed) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
-                message: 'BAD REQUEST'
+                extensions: [
+                    {
+                        message: 'Confirmation code already confirmed',
+                        field: 'code'
+                    }
+                ]
             })
         }
-        if (user.emailConfirmation.expirationDate > new Date()) {
+        //@ts-ignore
+        if (user.emailConfirmation?.expirationDate && (user.emailConfirmation?.expirationDate < new Date())) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
-                message: '',
                 extensions: [
                     {
                         message: 'Confirmation code exp',
@@ -77,18 +105,18 @@ export class AuthService {
     }
 
     async login({loginOrEmail, password}: Login): Promise<string> {
-        const user = await this.usersRepository.findUserByLoginOrEmail({login: loginOrEmail, email: loginOrEmail})
+        const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.Unauthorized,
-                message: 'Password or login or email is wrong'
+                message: 'Password or login or email is wrong!!!'
             })
         }
         const isCompare = await bcrypt.compare(password, user.passwordHash)
         if (!isCompare) {
             throw new DomainException({
                 code: DomainExceptionCode.Unauthorized,
-                message: 'Password or login or email is wrong'
+                message: 'Password or login or email is wrong123'
             })
         }
         const {accessToken} = await this.jwtService.createToken(user.id)
@@ -130,12 +158,11 @@ export class AuthService {
     }
 
     async emailConfirmationCodeResending(email: string) {
-        const user = await this.usersRepository.findUserByLoginOrEmail({login: email, email})
+        const user = await this.usersRepository.findUserByEmail(email)
 
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
-                message: 'User not found',
                 extensions: [
                     {
                         message: 'User not found',
@@ -145,16 +172,29 @@ export class AuthService {
             })
 
         }
-        const now = new Date()
+        if (user.isEmailConfirmed) {
+            throw new DomainException({
+                code: DomainExceptionCode.BadRequest,
+                extensions: [
+                    {
+                        message: 'Confirmation code already confirmed',
+                        field: 'email'
+                    }
+                ]
+            })
+        }
         const confirmationCode = randomUUID()
-        const expirationDate = add(now, {hours: 1,})
+        const now = new Date();
+        const oneHourLaterMillis = now.getTime() + (60 * 60 * 1000);
+        const expirationDate = new Date(oneHourLaterMillis);
         user.updateEmailConfirmationCode(confirmationCode, expirationDate)
         await this.usersRepository.save(user)
         await this.mailer.sendEmail(email, 'Registration', 'Please, confirm registration', confirmationCode)
     }
 
     async passwordRecovery(email: string) {
-        const user = await this.usersRepository.findUserByLoginOrEmail({login: email, email})
+        const user = await this.usersRepository.findUserByLoginOrEmail(email)
+
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,

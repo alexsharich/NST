@@ -15,14 +15,12 @@ export class Mailer {
         await this.mailerService
             .sendMail({
                 to: email,
-                from: ` "Alexander" ${this.configService.get('MAIL')}'`,
                 subject: subject,
-                text: text,
                 html: subject === 'Registration' ? emailTemlptes.registrationEmail(code) : emailTemlptes.passwordRecoveryEmail(code),
             })
             .then(() => {
             })
-            .catch(() => {
+            .catch((e) => {
             });
     }
 }

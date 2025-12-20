@@ -24,7 +24,8 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() body: Login) {
-        return this.authService.login(body)
+        const token = await this.authService.login(body)
+        return {accessToken: token}
     }
 
     @Post('password-recovery')
@@ -37,11 +38,13 @@ export class AuthController {
         await this.authService.newPassword(body)
     }
 
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Post('registration-confirmation')
     async registrationConfirmation(@Body() code: RegistrationConfirmationCode) {
         await this.authService.registrationConfirmation(code)
     }
 
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Post('registration-email-resending')
     async registrationEmailResending(@Body() body: RegistrationEmailResending) {
         await this.authService.emailConfirmationCodeResending(body.email)

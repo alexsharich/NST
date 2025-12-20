@@ -6,10 +6,9 @@ import {IsStringWithTrim} from "../../../../../core/decorators/validation/is-str
 export class CreateBlogInputDto {
     @IsStringWithTrim(nameConstraints.minLength, nameConstraints.maxLength)
     name: string;
-    @Length(descriptionConstraints.maxLength)
+    @Length(descriptionConstraints.minLength, descriptionConstraints.maxLength)
     description: string;
-    @IsEmail()
-    @Matches(emailConstraints.match)
+    @Matches(websiteUrlConstraints.match)
     @IsStringWithTrim(websiteUrlConstraints.minLength, websiteUrlConstraints.maxLength)
     websiteUrl: string;
 }
