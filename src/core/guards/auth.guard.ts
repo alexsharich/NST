@@ -1,17 +1,18 @@
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
-import {Observable} from "rxjs";
 import {Request} from "express";
 import {DomainException} from "../exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../exceptions/domain-exceptions-codes";
 import {JwtService} from "../../application/jwt.service";
+import {UsersRepository} from "../../modules/user-accounts/infrastructure/users.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    constructor(private readonly jwtService: JwtService) {
+    constructor(private readonly jwtService: JwtService,
+                private readonly usersRepository: UsersRepository) {
 
     }
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: Request = context.switchToHttp().getRequest()
         const auth = request.headers['authorization']
         if (!auth) {
@@ -23,6 +24,11 @@ export class AuthGuard implements CanActivate {
             throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
         }
         request.userId = payload!.userId
+        const isUserExist = await this.usersRepository.findOne(request!.userId)
+        if (!isUserExist) {
+            throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
+        }
+        request.user = isUserExist
         return true
     }
 }

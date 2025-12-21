@@ -9,6 +9,8 @@ import {ConfigModule} from '@nestjs/config';
 import {MailModule} from "./modules/mail/mail-module";
 import {APP_FILTER} from "@nestjs/core";
 import {DomainHttpExceptionsFilter} from "./core/exceptions/filters/domain-exeptions-filter";
+import { CqrsModule } from '@nestjs/cqrs';
+
 
 
 @Module({
@@ -17,7 +19,8 @@ import {DomainHttpExceptionsFilter} from "./core/exceptions/filters/domain-exept
         BloggersPlatformModule,
         ClearDBModule,
         ConfigModule.forRoot({isGlobal: true}),
-        MailModule],
+        MailModule,
+        CqrsModule.forRoot()],
     controllers: [AppController],
     providers: [AppService,
         {

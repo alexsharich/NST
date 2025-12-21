@@ -11,14 +11,40 @@ import {PostsRepository} from "./posts/infrastructure/posts.repository";
 import {PostsQueryRepository} from "./posts/infrastructure/query/posts-query-repository";
 import {PostsService} from "./posts/application/posts.service";
 import {PostsController} from "./posts/api/posts.controller";
+import {CreateCommandHandler} from "./comments/application/use-cases/create-command.handler";
+import {CommentSchema, Comment} from "./comments/domain/comment.entity";
+import {CommentsRepository} from "./comments/infrastructure/comments.repository";
+import {User, UserSchema} from "../user-accounts/domain/user.entity";
+import {JwtService} from "../../application/jwt.service";
+import {UsersRepository} from "../user-accounts/infrastructure/users.repository";
+import {
+    GetCommentByIdQueryHandler
+} from "./comments/application/queries/get-comment-by-id/get-comment-by-id.query.handler";
+import {CommentsQueryRepository} from "./comments/infrastructure/query/comments.query-repository";
+import {CommentsController} from "./comments/api/comments.controller";
+import { UpdateCommentCommandHandler } from './comments/application/use-cases/update-comment/update-comment.handler';
+
+const commands = [CreateCommandHandler, UpdateCommentCommandHandler]
+const queries = [GetCommentByIdQueryHandler]
 
 @Module({
-    imports: [UserAccountsModule, MongooseModule.forFeature([{name: Blog.name, schema: BlogSchema}, {
-        name: Post.name,
-        schema: PostSchema
-    }])],
-    providers: [BlogsService, BlogsRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, PostsService],
-    controllers: [BlogsController, PostsController]
+    imports: [UserAccountsModule,
+        MongooseModule.forFeature([
+            {name: Blog.name, schema: BlogSchema},
+            {
+                name: Post.name, schema: PostSchema
+            },
+
+            {
+                name: Comment.name,
+                schema: CommentSchema
+            },
+            {
+                name: User.name,
+                schema: UserSchema
+            }])],
+    providers: [BlogsService, JwtService, UsersRepository, BlogsRepository, CommentsRepository, CommentsQueryRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, PostsService, ...commands, ...queries],
+    controllers: [BlogsController, PostsController, CommentsController]
 })
 export class BloggersPlatformModule {
 }

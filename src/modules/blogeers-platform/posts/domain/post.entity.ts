@@ -26,10 +26,8 @@ export class Post {
     /*  @Prop({ type: Boolean, required: true, default: false })
       isEmailConfirmed: boolean;*/
 
-
     createdAt: Date;
     updatedAt: Date;
-
 
     @Prop({type: Date, nullable: true})
     deletedAt: Date | null;

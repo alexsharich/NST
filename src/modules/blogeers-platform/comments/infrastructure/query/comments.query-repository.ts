@@ -1,16 +1,25 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {BlogViewDto} from "../../../blogs/api/view-dto/blog.view-dto";
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from "@nestjs/mongoose";
+import {Comment, CommentModelType} from "../../domain/comment.entity";
+import {CommentViewDto} from "../../api/view-dto/comment-view.dto";
+import {DomainException} from "../../../../../core/exceptions/domain-exceptions";
+import {DomainExceptionCode} from "../../../../../core/exceptions/domain-exceptions-codes";
+
 
 @Injectable()
 export class CommentsQueryRepository {
-    constructor() {
+    constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType) {
     }
-    /*async getByIdOrNotFoundFail(id: string): Promise<CommentViewDto> {
+
+    async getByIdOrNotFoundFail(id: string): Promise<CommentViewDto> {
         const comment = await this.CommentModel.findById(id)
         if (!comment) {
-            throw new NotFoundException('Comment not found')
+            throw new DomainException({
+                code: DomainExceptionCode.NotFound,
+                message: 'Comment not found'
+            })
         }
-        return BlogViewDto.mapToView(comment)
-    }*/
+        return CommentViewDto.mapToView(comment)
+    }
 
 }
