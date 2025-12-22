@@ -1,8 +1,8 @@
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
 import {CreateCommentCommand} from "./create-comment.command";
 import {InjectModel} from "@nestjs/mongoose";
-import {CommentModelType, Comment} from "../../domain/comment.entity";
-import {CommentsRepository} from "../../infrastructure/comments.repository";
+import {CommentModelType, Comment} from "../../../domain/comment.entity";
+import {CommentsRepository} from "../../../infrastructure/comments.repository";
 
 @CommandHandler(CreateCommentCommand)
 export class CreateCommandHandler implements ICommandHandler<CreateCommentCommand, string> {

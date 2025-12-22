@@ -1,24 +1,26 @@
+import {DeleteCommentCommand} from "./delete-comment-command";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
-import {UpdateCommentCommand} from "./update-comment-command";
-import {InjectModel} from "@nestjs/mongoose";
 import {Comment, CommentModelType} from "../../../domain/comment.entity";
-import {CommentsRepository} from "../../../infrastructure/comments.repository";
+import {InjectModel} from "@nestjs/mongoose";
 import {DomainException} from "../../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../../core/exceptions/domain-exceptions-codes";
+import {CommentsRepository} from "../../../infrastructure/comments.repository";
 
-@CommandHandler(UpdateCommentCommand)
-export class UpdateCommentCommandHandler implements ICommandHandler<UpdateCommentCommand, void> {
+@CommandHandler(DeleteCommentCommand)
+export class DeleteCommentCommandHandler implements ICommandHandler<DeleteCommentCommand, void> {
     constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
-                private readonly commentsRepository: CommentsRepository,) {
+                private readonly commentsRepository: CommentsRepository) {
 
     }
 
-    async execute({id, content, userId}: UpdateCommentCommand) {
+
+    async execute({id, userId}: DeleteCommentCommand) {
         const comment = await this.CommentModel.findOne({_id: id, deletedAt: null})
+
         if (!comment) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
-                message: 'Comment not found'
+                message: "Comment not found"
             })
         }
         if (comment.userId !== userId) {
@@ -27,7 +29,8 @@ export class UpdateCommentCommandHandler implements ICommandHandler<UpdateCommen
                 message: 'Forbidden'
             })
         }
-        comment.update(content)
+        comment.makeDeleted()
+
         await this.commentsRepository.save(comment)
     }
 }

@@ -1,6 +1,7 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
 
+export type LikeStatus = 'None' | 'Like' | 'Dislike'
 
 @Schema({timestamps: true})
 export class Comment {
@@ -36,8 +37,13 @@ export class Comment {
     update(content: string) {
         this.content = content
     }
-    makeDeleted(){
+
+    makeDeleted() {
         this.deletedAt = new Date()
+    }
+
+    changeStatus(status: LikeStatus) {
+
     }
 
 }

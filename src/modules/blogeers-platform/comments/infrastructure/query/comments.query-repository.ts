@@ -12,7 +12,8 @@ export class CommentsQueryRepository {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<CommentViewDto> {
-        const comment = await this.CommentModel.findById(id)
+        const comment = await this.CommentModel.findOne({_id: id, deletedAt: null})
+
         if (!comment) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

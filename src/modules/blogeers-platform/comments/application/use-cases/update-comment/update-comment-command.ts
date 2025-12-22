@@ -1,5 +1,5 @@
 export class UpdateCommentCommand {
-    constructor(public id: string, public content: string){
+    constructor(public id: string, public content: string, public userId: string) {
 
     }
 }
