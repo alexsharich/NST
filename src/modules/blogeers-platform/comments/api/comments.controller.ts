@@ -4,9 +4,9 @@ import {GetCommentByIdQuery} from "../application/queries/get-comment-by-id/get-
 import {UpdateCommentCommand} from '../application/use-cases/update-comment/update-comment-command';
 import {DeleteCommentCommand} from "../application/use-cases/delete-comment/delete-comment-command";
 import {ChangeLikeCommentStatusCommand} from "../application/use-cases/change-like-status/change-like-status.command";
-import {LikeStatusType} from "../domain/comment.entity";
 import {Request} from "express";
 import {AuthGuard} from "../../../../core/guards/auth.guard";
+import {LikeStatus} from "../domain/comment.entity";
 
 
 @Controller('comments')
@@ -26,9 +26,9 @@ export class CommentsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(AuthGuard)
     @Put(':commentId/like-status')
-    async changeLikeCommentStatus(@Body('likeStatus') likeStatus: LikeStatusType, @Param('commentId') commentId: string, @Req() req: Request) {
-        const userId = req.userId!
-        return this.commandBus.execute(new ChangeLikeCommentStatusCommand(commentId, likeStatus, userId))
+    async changeLikeCommentStatus(@Body('likeStatus') likeStatus: LikeStatus, @Param('commentId') commentId: string, @Req() req: Request) {
+        const user = req.user!
+        return this.commandBus.execute(new ChangeLikeCommentStatusCommand(commentId, likeStatus, user))
     }
 
     @UseGuards(AuthGuard)

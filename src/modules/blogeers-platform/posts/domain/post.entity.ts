@@ -2,6 +2,7 @@ import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
 import {UpdatePostInputDto} from "../api/input-dto/update-post.input-dto";
 import {CreatePostDomainDto} from "./dto/create-post.domain.dto";
+import {LikeStatus} from "../../../../core/dto/like.status";
 
 
 @Schema({timestamps: true})
@@ -22,12 +23,18 @@ export class Post {
     @Prop({type: String, min: 5, required: true})
     blogName: string;
 
+    @Prop({type: Number, required: true})
+    likesCount: number;
+    @Prop({type: Number, required: true})
+    dislikesCount: number;
+
 
     /*  @Prop({ type: Boolean, required: true, default: false })
       isEmailConfirmed: boolean;*/
 
     createdAt: Date;
     updatedAt: Date;
+
 
     @Prop({type: Date, nullable: true})
     deletedAt: Date | null;
@@ -61,6 +68,51 @@ export class Post {
         this.title = title
         this.content = content
     }
+
+    updateCounter(likeStatus: LikeStatus, myStatus?: LikeStatus) {
+        switch (likeStatus) {
+            case "Like": {
+                if (myStatus === 'Dislike') {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                    this.likesCount++
+                }
+                if (myStatus === 'Like') {
+                    return
+                }
+                if (myStatus === 'None') {
+                    this.likesCount++
+                }
+                break
+            }
+            case "Dislike": {
+                if (myStatus === 'Dislike') {
+                    return
+                }
+                if (myStatus === 'Like') {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                    this.likesCount++
+                }
+                if (myStatus === 'None') {
+                    this.dislikesCount++
+                }
+                break
+            }
+            case "None": {
+                if (myStatus === "Like") {
+                    this.likesCount > 0 && this.likesCount--
+
+                }
+                if (myStatus === "Dislike") {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                }
+                if (myStatus === "None") {
+                    return
+                }
+                break
+            }
+        }
+    }
+
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

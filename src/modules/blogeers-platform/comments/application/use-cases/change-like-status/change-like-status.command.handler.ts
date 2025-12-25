@@ -5,19 +5,19 @@ import {CommentModelType, Comment} from "../../../domain/comment.entity";
 import {CommentsRepository} from "../../../infrastructure/comments.repository";
 import {DomainException} from "../../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../../core/exceptions/domain-exceptions-codes";
-import {LikeCommentModelType} from "../../../../likes/likes-comments/domain/like-comment.entity";
+import {LikeComment, LikeCommentModelType} from "../../../../likes/likes-comments/domain/like-comment.entity";
 import {LikesRepository} from "../../../../likes/likes-comments/infrastructure/like-comment.repository";
 
 @CommandHandler(ChangeLikeCommentStatusCommand)
 export class ChangeLikeStatusCommandHandler implements ICommandHandler<ChangeLikeCommentStatusCommand, void> {
     constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
                 private readonly commentsRepository: CommentsRepository,
-                private readonly likeCommentModel: LikeCommentModelType,
+                @InjectModel(LikeComment.name) private readonly likeCommentModel: LikeCommentModelType,
                 private readonly likeCommentsRepository: LikesRepository) {
 
     }
 
-    async execute({likeStatus, commentId, userId}: ChangeLikeCommentStatusCommand) {
+    async execute({likeStatus, commentId, user}: ChangeLikeCommentStatusCommand) {
         const comment = await this.CommentModel.findOne({_id: commentId, deletedAt: null})
         if (!comment) {
             throw new DomainException({
@@ -25,19 +25,18 @@ export class ChangeLikeStatusCommandHandler implements ICommandHandler<ChangeLik
                 message: 'Not Found'
             })
         }
-        const isLikeExist = await this.likeCommentModel.findOne({commentId, userId})
-        if (!isLikeExist) {
-            const newLike = this.likeCommentModel.createLike(likeStatus, commentId, userId)
-            await this.likeCommentsRepository.save(newLike)
+        const isLikeExist = await this.likeCommentModel.findOne({commentId, user})
 
-            //comment.updateCount(!!!)
-            //promise.all
+        if (!isLikeExist) {
+            const newLike = this.likeCommentModel.createLike(likeStatus, commentId, user)
+            comment.updateCounter(likeStatus)
+            await Promise.all([this.likeCommentsRepository.save(newLike), this.commentsRepository.save(comment)])
             return
         }
-        isLikeExist.update(likeStatus)
-        //comment.updateCount(!!!)
-        //promise.all
-        await this.likeCommentsRepository.save(isLikeExist)
 
+        comment.updateCounter(likeStatus, isLikeExist.myStatus)
+        isLikeExist.update(likeStatus)
+
+        await Promise.all([this.likeCommentsRepository.save(isLikeExist), this.commentsRepository.save(comment)])
     }
 }

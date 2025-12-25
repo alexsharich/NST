@@ -42,11 +42,52 @@ export class Comment {
         this.deletedAt = new Date()
     }
 
-    changeStatus(status: LikeStatus) {
+    updateCounter(likeStatus: LikeStatus, myStatus: LikeStatus = 'None') {
+        switch (likeStatus) {
+            case "Like": {
+                if (myStatus === 'Dislike') {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                    this.likesCount++
+                }
+                if (myStatus === 'Like') {
+                    return
+                }
+                if (myStatus === 'None') {
+                    this.likesCount++
+                }
+                break
+            }
+            case "Dislike": {
+                if (myStatus === 'Dislike') {
+                    return
+                }
+                if (myStatus === 'Like') {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                    this.likesCount++
+                }
+                if (myStatus === 'None') {
+                    this.dislikesCount++
+                }
+                break
+            }
+            case "None": {
+                if (myStatus === "Like") {
+                    this.likesCount > 0 && this.likesCount--
 
+                }
+                if (myStatus === "Dislike") {
+                    this.dislikesCount > 0 && this.dislikesCount--
+                }
+                if (myStatus === "None") {
+                    return
+                }
+                break
+            }
+        }
     }
 
 }
+
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
 

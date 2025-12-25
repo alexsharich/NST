@@ -12,8 +12,4 @@ export class CommentsRepository {
         return comment._id.toString()
     }
 
-    /* async findOne(id: string) {
-         return this.comentModel.findOne({_id: id, deletedAt: null})
-     }*/
-
 }

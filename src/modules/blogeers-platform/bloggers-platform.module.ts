@@ -32,9 +32,11 @@ import {
 import {
     GetCommentsForPostQueryHandler
 } from "./posts/application/use-cases/get-comments-for-post/get-comments-for-post.command.handler";
+import {LikeComment, LikeCommentSchema} from "./likes/likes-comments/domain/like-comment.entity";
+import {LikesRepository} from "./likes/likes-comments/infrastructure/like-comment.repository";
 
-const commands = [CreateCommandHandler, UpdateCommentCommandHandler, DeleteCommentCommandHandler, ChangeLikeStatusCommandHandler]
-const queries = [GetCommentByIdQueryHandler,GetCommentsForPostQueryHandler]
+const commands = [CreateCommandHandler, UpdateCommentCommandHandler, ChangeLikeStatusCommandHandler, DeleteCommentCommandHandler, ChangeLikeStatusCommandHandler]
+const queries = [GetCommentByIdQueryHandler, GetCommentsForPostQueryHandler]
 
 @Module({
     imports: [UserAccountsModule,
@@ -49,10 +51,14 @@ const queries = [GetCommentByIdQueryHandler,GetCommentsForPostQueryHandler]
                 schema: CommentSchema
             },
             {
+                name: LikeComment.name,
+                schema: LikeCommentSchema
+            },
+            {
                 name: User.name,
                 schema: UserSchema
             }])],
-    providers: [BlogsService, JwtService, UsersRepository, BlogsRepository, CommentsRepository, CommentsQueryRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, PostsService, ...commands, ...queries],
+    providers: [BlogsService, JwtService, UsersRepository, LikesRepository, BlogsRepository, CommentsRepository, CommentsQueryRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, PostsService, ...commands, ...queries],
     controllers: [BlogsController, PostsController, CommentsController]
 })
 export class BloggersPlatformModule {

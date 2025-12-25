@@ -22,11 +22,9 @@ import {CommandBus, QueryBus} from "@nestjs/cqrs";
 import {CreateCommentCommand} from "../../comments/application/use-cases/create-comment/create-comment.command";
 import {AuthGuard} from "../../../../core/guards/auth.guard";
 import {GetCommentByIdQuery} from "../../comments/application/queries/get-comment-by-id/get-comment-by-id.query";
-import {
-    UpdatePostLikeStatusCommand
-} from "../application/use-cases/update-post-like-status/update-post-like-status.command";
-import {LikeStatusType} from "../../comments/domain/comment.entity";
 import {GetCommentsForPostQuery} from "../application/use-cases/get-comments-for-post/get-comments-for-post.command";
+import {LikeStatus} from "../../comments/domain/comment.entity";
+import {ChangeLikePostStatusCommand} from "../../likes/likes-posts/aplication/use-cases/change-like-post.command";
 
 
 @Controller('posts')
@@ -36,9 +34,11 @@ export class PostsController {
                 private readonly queryBus: QueryBus) {
     }
 
+    @UseGuards(AuthGuard)
     @Put(':postId/like-status')
-    async changeLikePostStatus(@Param('postId') postId: string, @Body('likeStatus') likeStatus: LikeStatusType) {
-        return this.commandBus.execute(new UpdatePostLikeStatusCommand(likeStatus, postId))
+    async changeLikePostStatus(@Param('postId') postId: string, @Req() req: Request, @Body('likeStatus') likeStatus: LikeStatus) {
+        const user = req.user!
+        return this.commandBus.execute(new ChangeLikePostStatusCommand(postId, likeStatus, user))
     }
 
     @Post()
