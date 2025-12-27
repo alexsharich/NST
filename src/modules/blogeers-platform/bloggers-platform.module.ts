@@ -34,21 +34,31 @@ import {
 } from "./posts/application/use-cases/get-comments-for-post/get-comments-for-post.command.handler";
 import {LikeComment, LikeCommentSchema} from "./likes/likes-comments/domain/like-comment.entity";
 import {LikesRepository} from "./likes/likes-comments/infrastructure/like-comment.repository";
+import {ChangeLikePostCommandHandler} from "./likes/likes-posts/aplication/use-cases/change-like-post.command.handler";
+import {LikePost, LikePostSchema} from "./likes/likes-posts/domain/like-post.entity";
 
-const commands = [CreateCommandHandler, UpdateCommentCommandHandler, ChangeLikeStatusCommandHandler, DeleteCommentCommandHandler, ChangeLikeStatusCommandHandler]
+const commands = [CreateCommandHandler, UpdateCommentCommandHandler, ChangeLikeStatusCommandHandler, DeleteCommentCommandHandler, ChangeLikePostCommandHandler]
 const queries = [GetCommentByIdQueryHandler, GetCommentsForPostQueryHandler]
 
 @Module({
     imports: [UserAccountsModule,
         MongooseModule.forFeature([
-            {name: Blog.name, schema: BlogSchema},
             {
-                name: Post.name, schema: PostSchema
+                name: Blog.name,
+                schema: BlogSchema
+            },
+            {
+                name: Post.name,
+                schema: PostSchema
             },
 
             {
                 name: Comment.name,
                 schema: CommentSchema
+            },
+            {
+                name: LikePost.name,
+                schema: LikePostSchema
             },
             {
                 name: LikeComment.name,
