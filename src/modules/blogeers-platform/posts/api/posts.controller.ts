@@ -73,7 +73,6 @@ export class PostsController {
         return this.postsQueryRepository.getByIdOrNotFoundFail(id)
     }
 
-
     @HttpCode(HttpStatus.OK)
     @Get()
     async getAll(@Query() queries: GetPostQueryParams) {

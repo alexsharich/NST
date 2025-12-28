@@ -1,4 +1,4 @@
-import {IsEmail, Length, Matches} from "class-validator";
+import {Length, Matches} from "class-validator";
 import {descriptionConstraints, nameConstraints, websiteUrlConstraints} from "../../domain/dto/create-blog.domain.dto";
 import {IsStringWithTrim} from "../../../../../core/decorators/validation/is-string-with-string";
 

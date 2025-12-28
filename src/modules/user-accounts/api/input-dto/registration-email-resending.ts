@@ -1,4 +1,4 @@
-import {IsEmail, IsString, Matches} from "class-validator";
+import {IsEmail, IsString} from "class-validator";
 import {Trim} from "../../../../core/decorators/transform/trim";
 
 export class RegistrationEmailResending {
