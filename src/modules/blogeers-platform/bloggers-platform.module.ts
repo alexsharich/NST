@@ -36,6 +36,7 @@ import {LikeComment, LikeCommentSchema} from "./likes/likes-comments/domain/like
 import {LikesRepository} from "./likes/likes-comments/infrastructure/like-comment.repository";
 import {ChangeLikePostCommandHandler} from "./likes/likes-posts/aplication/use-cases/change-like-post.command.handler";
 import {LikePost, LikePostSchema} from "./likes/likes-posts/domain/like-post.entity";
+import {LikesPostRepository} from "./likes/likes-posts/infrastructure/like-post.repository";
 
 const commands = [CreateCommandHandler, UpdateCommentCommandHandler, ChangeLikeStatusCommandHandler, DeleteCommentCommandHandler, ChangeLikePostCommandHandler]
 const queries = [GetCommentByIdQueryHandler, GetCommentsForPostQueryHandler]
@@ -68,7 +69,7 @@ const queries = [GetCommentByIdQueryHandler, GetCommentsForPostQueryHandler]
                 name: User.name,
                 schema: UserSchema
             }])],
-    providers: [BlogsService, JwtService, UsersRepository, LikesRepository, BlogsRepository, CommentsRepository, CommentsQueryRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, PostsService, ...commands, ...queries],
+    providers: [BlogsService, JwtService, UsersRepository, LikesRepository, BlogsRepository, CommentsRepository, CommentsQueryRepository, BlogsQueryRepository, PostsRepository, PostsQueryRepository, LikesPostRepository, PostsService, ...commands, ...queries],
     controllers: [BlogsController, PostsController, CommentsController]
 })
 export class BloggersPlatformModule {

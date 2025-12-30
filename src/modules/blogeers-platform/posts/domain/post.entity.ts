@@ -1,4 +1,4 @@
-import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
 import {UpdatePostInputDto} from "../api/input-dto/update-post.input-dto";
 import {CreatePostDomainDto} from "./dto/create-post.domain.dto";
@@ -23,9 +23,9 @@ export class Post {
     @Prop({type: String, min: 5, required: true})
     blogName: string;
 
-    @Prop({type: Number, required: true})
+    @Prop({type: Number, default: 0})
     likesCount: number;
-    @Prop({type: Number, required: true})
+    @Prop({type: Number, default: 0})
     dislikesCount: number;
 
 
@@ -69,7 +69,7 @@ export class Post {
         this.content = content
     }
 
-    updateCounter(likeStatus: LikeStatus, myStatus?: LikeStatus) {
+    updateCounter(likeStatus: LikeStatus, myStatus: LikeStatus = LikeStatus.None) {
         switch (likeStatus) {
             case "Like": {
                 if (myStatus === 'Dislike') {

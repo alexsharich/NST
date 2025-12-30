@@ -4,15 +4,26 @@ import {
     shortDescriptionConstraints,
     titleConstraints
 } from "../../domain/dto/create-post.domain.dto";
-import {IsString} from "class-validator";
+import {IsNotEmpty, IsString, Length} from "class-validator";
+import {Trim} from "../../../../../core/decorators/transform/trim";
 
 export class UpdatePostInputDto {
-    @IsStringWithTrim(titleConstraints.minLength, titleConstraints.maxLength)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(titleConstraints.minLength, titleConstraints.maxLength)
     title: string;
-    @IsStringWithTrim(shortDescriptionConstraints.minLength, shortDescriptionConstraints.maxLength)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(shortDescriptionConstraints.minLength, shortDescriptionConstraints.maxLength)
     shortDescription: string;
-    @IsStringWithTrim(contentConstraints.minLength, contentConstraints.maxLength)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(contentConstraints.minLength, contentConstraints.maxLength)
     content: string;
+    @Trim()
     @IsString()
     blogId: string;
 }

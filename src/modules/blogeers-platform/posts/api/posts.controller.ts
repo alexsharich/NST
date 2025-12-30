@@ -23,8 +23,11 @@ import {CreateCommentCommand} from "../../comments/application/use-cases/create-
 import {AuthGuard} from "../../../../core/guards/auth.guard";
 import {GetCommentByIdQuery} from "../../comments/application/queries/get-comment-by-id/get-comment-by-id.query";
 import {GetCommentsForPostQuery} from "../application/use-cases/get-comments-for-post/get-comments-for-post.command";
-import {LikeStatus} from "../../comments/domain/comment.entity";
 import {ChangeLikePostStatusCommand} from "../../likes/likes-posts/aplication/use-cases/change-like-post.command";
+import {ChangeStatusDto} from "./input-dto/change-status-dto";
+import {CreateNewCommentInputDto} from "./input-dto/create-comment-for-post-dto";
+import {UserIdGuard} from "../../../../core/guards/userId.quard";
+import {BasicGuard} from "../../../../core/guards/basic.guard";
 
 
 @Controller('posts')
@@ -36,50 +39,56 @@ export class PostsController {
 
     @UseGuards(AuthGuard)
     @Put(':postId/like-status')
-    async changeLikePostStatus(@Param('postId') postId: string, @Req() req: Request, @Body('likeStatus') likeStatus: LikeStatus) {
+    async changeLikePostStatus(@Param('postId') postId: string, @Req() req: Request, @Body() {likeStatus}: ChangeStatusDto) {
         const user = req.user!
         return this.commandBus.execute(new ChangeLikePostStatusCommand(postId, likeStatus, user))
     }
 
+    @UseGuards(BasicGuard)
     @Post()
     async createPost(@Body() createPostInputDto: CreatePostInputDto) {
         return this.postsService.createPost(createPostInputDto)
     }
 
     @UseGuards(AuthGuard)
-    //TODO DTO с валидация
     @Post(':postId/comments')
-    async createPostForBlog(@Body('content') content: string, @Req() req: Request, @Param('postId') postId: string) {
+    async createPostForBlog(@Body() {content}: CreateNewCommentInputDto, @Req() req: Request, @Param('postId') postId: string) {
         const userId = req.userId!
         const userLogin = req.user!.login!
         const commentId = await this.commandBus.execute(new CreateCommentCommand(content, postId, userId, userLogin))
         return this.queryBus.execute(new GetCommentByIdQuery(commentId))
     }
 
+    @UseGuards(BasicGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(':id')
     async deletePost(@Param('id') id: string) {
         await this.postsService.deletePost(id)
     }
 
+    @UseGuards(BasicGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':id')
     async updatePost(@Param('id') id: string, @Body() updatePostInputDto: UpdatePostInputDto) {
         await this.postsService.updatePost(id, updatePostInputDto)
     }
 
+    @UseGuards(UserIdGuard)
     @Get(':id')
-    async getPost(@Param('id') id: string) {
-        return this.postsQueryRepository.getByIdOrNotFoundFail(id)
+    async getPost(@Param('id') id: string, @Req() req: Request) {
+        const userId = req.userId
+        return this.postsQueryRepository.getByIdOrNotFoundFail(id, userId || undefined)
     }
 
     @HttpCode(HttpStatus.OK)
+    @UseGuards(UserIdGuard)
     @Get()
-    async getAll(@Query() queries: GetPostQueryParams) {
-        return this.postsQueryRepository.getAll(queries)
+
+    async getAll(@Query() queries: GetPostQueryParams, @Req() req: Request) {
+        const userId = req.userId
+        return this.postsQueryRepository.getAll(queries, undefined, userId || undefined)
     }
 
-    //TODO
     @Get(':postId/comments')
     async getCommentsForPost(@Param('postId') postId: string, @Query() queries: GetPostQueryParams) {
         return this.queryBus.execute(new GetCommentsForPostQuery(postId, queries))

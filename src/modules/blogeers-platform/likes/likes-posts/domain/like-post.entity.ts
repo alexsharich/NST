@@ -1,4 +1,4 @@
-import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
 import {LikeStatus} from "../../../../../core/dto/like.status";
 import {UserDocument} from "../../../../user-accounts/domain/user.entity";
@@ -15,9 +15,11 @@ export class LikePost {
     @Prop({type: String, required: true})
     login: string;
 
+    createdAt: Date
 
-    static createLikePost(user: UserDocument, likeStatus: LikeStatus = 'None', postId: string) {
-        const likePost = new LikePost()
+
+    static createLikePost(user: UserDocument, likeStatus: LikeStatus = LikeStatus.None, postId: string) {
+        const likePost = new this()
         likePost.postId = postId
         likePost.userId = String(user._id)
         likePost.myStatus = likeStatus

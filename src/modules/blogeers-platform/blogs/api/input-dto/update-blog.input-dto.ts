@@ -1,16 +1,24 @@
 import {IsStringWithTrim} from "../../../../../core/decorators/validation/is-string-with-string";
-import {emailConstraints} from "../../../../user-accounts/domain/user.entity";
 import {descriptionConstraints, nameConstraints, websiteUrlConstraints} from "../../domain/dto/create-blog.domain.dto";
-import {IsEmail, Matches} from "class-validator";
+import {IsNotEmpty, IsString, Length, Matches} from "class-validator";
+import {Trim} from "../../../../../core/decorators/transform/trim";
 
 export class UpdateBlogInputDto {
-    @IsStringWithTrim(nameConstraints.minLength, nameConstraints.maxLength)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(nameConstraints.minLength, nameConstraints.maxLength)
     name: string;
-    @IsStringWithTrim(descriptionConstraints.minLength, descriptionConstraints.maxLength)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(descriptionConstraints.minLength, descriptionConstraints.maxLength)
     description: string;
-    @IsEmail()
-    @Matches(emailConstraints.match)
-    @IsStringWithTrim(websiteUrlConstraints.minLength, websiteUrlConstraints.maxLength)
+    @Matches(websiteUrlConstraints.match)
+    @IsNotEmpty()
+    @IsString()
+    @Trim()
+    @Length(websiteUrlConstraints.minLength, websiteUrlConstraints.maxLength)
     websiteUrl: string;
 }
 

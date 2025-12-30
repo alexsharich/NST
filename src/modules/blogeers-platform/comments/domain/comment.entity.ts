@@ -1,7 +1,7 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
+import {LikeStatus} from "../../../../core/dto/like.status";
 
-export type LikeStatus = 'None' | 'Like' | 'Dislike'
 
 @Schema({timestamps: true})
 export class Comment {
@@ -42,7 +42,7 @@ export class Comment {
         this.deletedAt = new Date()
     }
 
-    updateCounter(likeStatus: LikeStatus, myStatus: LikeStatus = 'None') {
+    updateCounter(likeStatus: LikeStatus, myStatus: LikeStatus = LikeStatus.None) {
         switch (likeStatus) {
             case "Like": {
                 if (myStatus === 'Dislike') {

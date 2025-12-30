@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {PasswordRecoveryType} from "./input-dto/password-recovery-dto";
 import {NewPasswordType} from "./input-dto/new-password";
 import {RegistrationConfirmationCode} from "./input-dto/registration-confirmation-code";
@@ -7,11 +7,14 @@ import {CreateUserInputDto} from "./input-dto/users.input-dto";
 import {AuthService} from "../application/auth.service";
 import {Login} from "./input-dto/login";
 import {AuthGuard} from "../../../core/guards/auth.guard";
-import {Request} from 'express'
+import {Request, Response} from 'express'
+import {daysToMs} from "../../../helpers/days-to-ms";
+import {JwtService} from "../../../application/jwt.service";
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {
+    constructor(private readonly authService: AuthService,
+                private readonly jwtService: JwtService) {
 
     }
 
@@ -23,9 +26,47 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    async login(@Body() body: Login) {
-        const token = await this.authService.login(body)
-        return {accessToken: token}
+    async login(@Body() body: Login, @Res() res: Response) {
+        const {accessToken, refreshToken} = await this.authService.login(body)
+        res.cookie('refreshToken', refreshToken, {
+            maxAge: (daysToMs(3)),
+            httpOnly: true,
+            secure: true
+        })
+        return {accessToken: accessToken}
+    }
+
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Post('logout')
+    async logout(@Res() res: Response) {
+        res.clearCookie('refreshToken')
+        return
+    }
+
+    @Post('refresh-token')
+    async refreshToken(@Req() req: Request, @Res() res: Response) {
+        const userId = req.userId
+        const deviceId = req.deviceId
+        if (!userId) {
+            res.sendStatus(401)
+            return
+        }
+
+
+        const {accessToken, refreshToken} = this.jwtService.createToken(userId, String(deviceId))
+        const tokenDecoded = this.jwtService.decodeToken(refreshToken)
+
+        if (!tokenDecoded) {
+            res.sendStatus(401)
+            return
+        }
+
+        res.cookie('refreshToken', refreshToken, {
+            maxAge: (daysToMs(3)),
+            httpOnly: true,
+            secure: true
+        })
+        res.status(200).json({accessToken})
     }
 
     @Post('password-recovery')

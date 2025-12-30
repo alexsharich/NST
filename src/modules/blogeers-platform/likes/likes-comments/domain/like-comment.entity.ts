@@ -1,14 +1,14 @@
 import {Schema, Prop, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Model} from 'mongoose';
-import {LikeStatus} from "../../../comments/domain/comment.entity";
 import {UserDocument} from "../../../../user-accounts/domain/user.entity";
+import {LikeStatus} from "../../../../../core/dto/like.status";
 
 
 @Schema({timestamps: true})
 export class LikeComment {
     @Prop({type: String, required: true})
     userId: string;
-    @Prop({type: String, required: true})
+    @Prop({type: String, enum: LikeStatus, required: true})
     myStatus: LikeStatus;
     @Prop({type: String, required: true})
     commentId: string;

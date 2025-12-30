@@ -1,1 +1,5 @@
-export type LikeStatus = 'None' | 'Like' | 'Dislike'
+export enum LikeStatus {
+    Like = "Like",
+    Dislike = "Dislike",
+    None = "None",
+}

@@ -38,13 +38,13 @@ export class ChangeLikePostCommandHandler implements ICommandHandler<ChangeLikeP
         const isLikePostExist = await this.LikePostModel.findOne({postId, userId})
 
         if (!isLikePostExist) {
-            const newLikePost = await this.LikePostModel.createLikePost(user, likeStatus, postId)
+            const newLikePost = this.LikePostModel.createLikePost(user, likeStatus, postId)
             post.updateCounter(likeStatus)
             await Promise.all([this.likesPostRepository.save(newLikePost), this.postsRepository.save(post)])
             return
         }
-        isLikePostExist.updateStatus(likeStatus)
         post.updateCounter(likeStatus, isLikePostExist.myStatus)
+        isLikePostExist.updateStatus(likeStatus)
         await Promise.all([this.likesPostRepository.save(isLikePostExist), this.postsRepository.save(post)])
     }
 }

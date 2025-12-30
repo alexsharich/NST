@@ -6,7 +6,8 @@ import {DeleteCommentCommand} from "../application/use-cases/delete-comment/dele
 import {ChangeLikeCommentStatusCommand} from "../application/use-cases/change-like-status/change-like-status.command";
 import {Request} from "express";
 import {AuthGuard} from "../../../../core/guards/auth.guard";
-import {LikeStatus} from "../domain/comment.entity";
+import {ChangeStatusDto} from "../../posts/api/input-dto/change-status-dto";
+import {CreateNewCommentInputDto} from "../../posts/api/input-dto/create-comment-for-post-dto";
 
 
 @Controller('comments')
@@ -17,7 +18,7 @@ export class CommentsController {
 
     @UseGuards(AuthGuard)
     @Put(':commentId')
-    async updateComment(@Body('content') content: string, @Param('commentId') commentId: string, @Req() req: Request) {
+    async updateComment(@Body() {content}: CreateNewCommentInputDto, @Param('commentId') commentId: string, @Req() req: Request) {
         const userId = req.userId!
         return this.commandBus.execute(new UpdateCommentCommand(commentId, content, userId))
     }
@@ -26,7 +27,7 @@ export class CommentsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(AuthGuard)
     @Put(':commentId/like-status')
-    async changeLikeCommentStatus(@Body('likeStatus') likeStatus: LikeStatus, @Param('commentId') commentId: string, @Req() req: Request) {
+    async changeLikeCommentStatus(@Body() {likeStatus}: ChangeStatusDto, @Param('commentId') commentId: string, @Req() req: Request) {
         const user = req.user!
         return this.commandBus.execute(new ChangeLikeCommentStatusCommand(commentId, likeStatus, user))
     }
