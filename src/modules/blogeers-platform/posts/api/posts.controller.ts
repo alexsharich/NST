@@ -38,6 +38,7 @@ export class PostsController {
     }
 
     @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':postId/like-status')
     async changeLikePostStatus(@Param('postId') postId: string, @Req() req: Request, @Body() {likeStatus}: ChangeStatusDto) {
         const user = req.user!
@@ -52,10 +53,10 @@ export class PostsController {
 
     @UseGuards(AuthGuard)
     @Post(':postId/comments')
-    async createPostForBlog(@Body() {content}: CreateNewCommentInputDto, @Req() req: Request, @Param('postId') postId: string) {
+    async createPostForBlog(@Body() content: CreateNewCommentInputDto, @Req() req: Request, @Param('postId') postId: string) {
         const userId = req.userId!
         const userLogin = req.user!.login!
-        const commentId = await this.commandBus.execute(new CreateCommentCommand(content, postId, userId, userLogin))
+        const commentId = await this.commandBus.execute(new CreateCommentCommand(content.content, postId, userId, userLogin))
         return this.queryBus.execute(new GetCommentByIdQuery(commentId))
     }
 
@@ -83,14 +84,16 @@ export class PostsController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(UserIdGuard)
     @Get()
-
     async getAll(@Query() queries: GetPostQueryParams, @Req() req: Request) {
         const userId = req.userId
         return this.postsQueryRepository.getAll(queries, undefined, userId || undefined)
     }
 
+    
+    @UseGuards(UserIdGuard)
     @Get(':postId/comments')
-    async getCommentsForPost(@Param('postId') postId: string, @Query() queries: GetPostQueryParams) {
-        return this.queryBus.execute(new GetCommentsForPostQuery(postId, queries))
+    async getCommentsForPost(@Param('postId') postId: string, @Query() queries: GetPostQueryParams, @Req() req: Request) {
+        const userId = req?.userId || undefined
+        return this.queryBus.execute(new GetCommentsForPostQuery(postId, queries, userId))
     }
 }

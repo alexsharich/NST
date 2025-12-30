@@ -6,6 +6,7 @@ import {GetPostQueryParams} from "../../api/input-dto/get-post-query-params.inpu
 import {FilterQuery} from "mongoose";
 import {PaginatedViewDto} from "../../../../../core/dto/base.paginated.view-dto";
 import {LikePost, LikePostModelType} from "../../../likes/likes-posts/domain/like-post.entity";
+import {LikeStatus} from "../../../../../core/dto/like.status";
 
 @Injectable()
 export class PostsQueryRepository {
@@ -22,17 +23,56 @@ export class PostsQueryRepository {
         }
         const likes = await this.LikePostModel.find().sort({createdAt: -1})
         const currentLike = likes.find((l) => l.postId === id && userId === l.userId)
-        const latestLikes = likes.filter(l => l.postId === id).slice(0, 3)
+        const latestLikes = likes.filter(l => l.postId === id && l.myStatus === LikeStatus.Like).slice(0, 3)
 
         return PostViewDto.mapToView(post, currentLike?.myStatus, latestLikes)
     }
 
-    async getAll(queries: GetPostQueryParams, postId?: string, userId?: string) {
+    async getCommentsForPost(postId: string, queries: GetPostQueryParams, userId?: string) {
         let filter: FilterQuery<Post> = {
             deletedAt: null,
         };
         if (postId) {
             filter = {...filter, postId}
+        }
+
+        if (queries.searchNameTerm) {
+            filter.$or = filter.$or || [];
+            filter.$or.push({
+                login: {$regex: queries.searchNameTerm, $options: 'i'},
+            });
+        }
+
+        const posts = await this.PostModel
+            .find(filter)
+            .sort({[queries.sortBy]: queries.sortDirection})
+            .skip(queries.calculateSkip())
+            .limit(queries.pageSize);
+
+        const totalCount = await this.PostModel.countDocuments(filter);
+        const likes = await this.LikePostModel.find().sort({createdAt: -1})
+
+        const items = posts.map((p) => {
+            const latestLikes = likes.filter(l => l.postId === String(p._id) && l.myStatus === LikeStatus.Like).slice(0, 3)
+            const currentLike = likes.find((l) => l.postId === String(p._id) && userId === l.userId)
+            return PostViewDto.mapToView(p, currentLike?.myStatus, latestLikes)
+        });
+
+        return PaginatedViewDto.mapToView({
+            items,
+            totalCount,
+            page: queries.pageNumber,
+            size: queries.pageSize,
+        });
+    }
+
+
+    async getAll(queries: GetPostQueryParams, blogId?: string, userId?: string,) {
+        let filter: FilterQuery<Post> = {
+            deletedAt: null,
+        };
+        if (blogId) {
+            filter = {...filter, blogId}
         }
 
         if (queries.searchNameTerm) {
@@ -52,7 +92,7 @@ export class PostsQueryRepository {
         const likes = await this.LikePostModel.find().sort({createdAt: -1})
 
         const items = posts.map((p) => {
-            const latestLikes = likes.filter(l => l.postId === String(p._id)).slice(0, 3)
+            const latestLikes = likes.filter(l => l.postId === String(p._id) && l.myStatus === LikeStatus.Like).slice(0, 3)
             const currentLike = likes.find((l) => l.postId === String(p._id) && userId === l.userId)
             return PostViewDto.mapToView(p, currentLike?.myStatus, latestLikes)
         });

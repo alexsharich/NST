@@ -18,3 +18,7 @@ export const contentConstraints = {
     minLength: 0,
     maxLength: 1000
 }
+export const commentContentConstraints = {
+    minLength: 20,
+    maxLength: 300
+}

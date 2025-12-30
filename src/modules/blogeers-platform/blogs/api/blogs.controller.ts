@@ -1,4 +1,17 @@
-import {Body, Controller, Query, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Query,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    UseGuards,
+    Req
+} from '@nestjs/common';
 import {CreateBlogInputDto} from "./input-dto/blogs.input-dto";
 import {BlogsService} from "../application/blogs.service";
 import {UpdateBlogInputDto} from "./input-dto/update-blog.input-dto";
@@ -6,6 +19,8 @@ import {BlogsQueryRepository} from "../infrastructure/query/blogs.query-reposito
 import {GetBlogsQueryParams} from "./input-dto/get-blogs-query-params.input-dto";
 import {CreatePostForSelectedBlogInputDto} from "./input-dto/create-post-for-blog.input-dto";
 import {BasicGuard} from "../../../../core/guards/basic.guard";
+import {UserIdGuard} from "../../../../core/guards/userId.quard";
+import {Request} from "express";
 
 
 @Controller('blogs')
@@ -47,9 +62,11 @@ export class BlogsController {
     }
 
     @HttpCode(HttpStatus.OK)
+    @UseGuards(UserIdGuard)
     @Get(':blogId/posts')
-    async getPostsForBlog(@Param('blogId') blogId: string, @Query() queries: GetBlogsQueryParams) {
-        return this.blogsService.getAllForPost(blogId, queries)
+    async getPostsForBlog(@Param('blogId') blogId: string, @Query() queries: GetBlogsQueryParams, @Req() req: Request) {
+        const userId = req?.userId || undefined
+        return this.blogsService.getAllForPost(blogId, queries, userId)
     }
 
     @UseGuards(BasicGuard)

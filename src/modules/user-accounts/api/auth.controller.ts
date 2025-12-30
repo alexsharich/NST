@@ -33,14 +33,15 @@ export class AuthController {
             httpOnly: true,
             secure: true
         })
-        return {accessToken: accessToken}
+
+        res.send({accessToken})
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
     async logout(@Res() res: Response) {
         res.clearCookie('refreshToken')
-        return
+        res.send()
     }
 
     @Post('refresh-token')
@@ -66,7 +67,7 @@ export class AuthController {
             httpOnly: true,
             secure: true
         })
-        res.status(200).json({accessToken})
+        res.send({accessToken})
     }
 
     @Post('password-recovery')

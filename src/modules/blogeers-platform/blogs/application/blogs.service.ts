@@ -44,12 +44,12 @@ export class BlogsService {
 
     }
 
-    async getAllForPost(blogId: string, queries: GetBlogsQueryParams) {
+    async getAllForPost(blogId: string, queries: GetBlogsQueryParams, userId?: string) {
         const blog = await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId)
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
-        return await this.postsQueryRepository.getAll(queries, blog.id)
+        return await this.postsQueryRepository.getAll(queries, blog.id, userId)
     }
 
     async deleteBlog(id: string) {

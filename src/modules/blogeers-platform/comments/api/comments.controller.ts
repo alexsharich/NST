@@ -8,6 +8,7 @@ import {Request} from "express";
 import {AuthGuard} from "../../../../core/guards/auth.guard";
 import {ChangeStatusDto} from "../../posts/api/input-dto/change-status-dto";
 import {CreateNewCommentInputDto} from "../../posts/api/input-dto/create-comment-for-post-dto";
+import {UserIdGuard} from "../../../../core/guards/userId.quard";
 
 
 @Controller('comments')
@@ -17,6 +18,7 @@ export class CommentsController {
     }
 
     @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':commentId')
     async updateComment(@Body() {content}: CreateNewCommentInputDto, @Param('commentId') commentId: string, @Req() req: Request) {
         const userId = req.userId!
@@ -41,8 +43,10 @@ export class CommentsController {
     }
 
     @Get(':id')
-    async getCommentById(@Param('id') id: string) {
-        return this.queryBus.execute(new GetCommentByIdQuery(id))
+    @UseGuards(UserIdGuard)
+    async getCommentById(@Param('id') id: string, @Req() req: Request) {
+        const userId = req?.userId || undefined
+        return this.queryBus.execute(new GetCommentByIdQuery(id, userId))
     }
 
 }

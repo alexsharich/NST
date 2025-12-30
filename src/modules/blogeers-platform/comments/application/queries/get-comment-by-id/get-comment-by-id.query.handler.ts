@@ -9,7 +9,7 @@ export class GetCommentByIdQueryHandler implements IQueryHandler<GetCommentByIdQ
 
     }
 
-    async execute({commentId}: GetCommentByIdQuery) {
-        return this.commentsQueryRepository.getByIdOrNotFoundFail(commentId)
+    async execute({commentId, userId}: GetCommentByIdQuery) {
+        return this.commentsQueryRepository.getByIdOrNotFoundFail(commentId, userId)
     }
 }

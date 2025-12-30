@@ -89,8 +89,8 @@ export class Post {
                     return
                 }
                 if (myStatus === 'Like') {
-                    this.dislikesCount > 0 && this.dislikesCount--
-                    this.likesCount++
+                    this.likesCount > 0 && this.likesCount--
+                    this.dislikesCount++
                 }
                 if (myStatus === 'None') {
                     this.dislikesCount++
