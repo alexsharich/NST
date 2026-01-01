@@ -4,7 +4,7 @@ import {Comment, CommentModelType} from "../../domain/comment.entity";
 import {CommentViewDto} from "../../api/view-dto/comment-view.dto";
 import {DomainException} from "../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../core/exceptions/domain-exceptions-codes";
-import {LikeComment, LikeCommentModelType} from "../../../likes/likes-comments/domain/like-comment.entity";
+import {LikeCommentModelType} from "../../../likes/likes-comments/domain/like-comment.entity";
 
 
 @Injectable()

@@ -25,7 +25,8 @@ export class ChangeLikeStatusCommandHandler implements ICommandHandler<ChangeLik
                 message: 'Not Found'
             })
         }
-        const isLikeExist = await this.likeCommentModel.findOne({commentId, user})
+        const isLikeExist = await this.likeCommentModel.findOne({commentId, userId: user._id.toString()})
+
 
         if (!isLikeExist) {
             const newLike = this.likeCommentModel.createLike(likeStatus, commentId, user)

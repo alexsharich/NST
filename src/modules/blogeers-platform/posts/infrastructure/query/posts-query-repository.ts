@@ -7,11 +7,18 @@ import {FilterQuery} from "mongoose";
 import {PaginatedViewDto} from "../../../../../core/dto/base.paginated.view-dto";
 import {LikePost, LikePostModelType} from "../../../likes/likes-posts/domain/like-post.entity";
 import {LikeStatus} from "../../../../../core/dto/like.status";
+import {Comment, CommentModelType} from "../../../comments/domain/comment.entity";
+import {LikeComment, LikeCommentModelType} from "../../../likes/likes-comments/domain/like-comment.entity";
+import {CommentViewDto} from "../../../comments/api/view-dto/comment-view.dto";
+import {PostsRepository} from "../posts.repository";
 
 @Injectable()
 export class PostsQueryRepository {
     constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType,
-                @InjectModel(LikePost.name) private readonly LikePostModel: LikePostModelType
+                @InjectModel(LikePost.name) private readonly LikePostModel: LikePostModelType,
+                @InjectModel(Comment.name) private readonly commentModel: CommentModelType,
+                @InjectModel(LikeComment.name) private readonly LikeCommentModel: LikeCommentModelType,
+                private readonly postsRepository: PostsRepository
     ) {
     }
 
@@ -29,6 +36,12 @@ export class PostsQueryRepository {
     }
 
     async getCommentsForPost(postId: string, queries: GetPostQueryParams, userId?: string) {
+        // TODO ??
+        const post = await this.PostModel.findOne({_id: postId, deletedAt: null})
+        if (!post) {
+            throw new NotFoundException('Post not found')
+        }
+
         let filter: FilterQuery<Post> = {
             deletedAt: null,
         };
@@ -43,19 +56,17 @@ export class PostsQueryRepository {
             });
         }
 
-        const posts = await this.PostModel
+        const posts = await this.commentModel
             .find(filter)
             .sort({[queries.sortBy]: queries.sortDirection})
             .skip(queries.calculateSkip())
             .limit(queries.pageSize);
-
-        const totalCount = await this.PostModel.countDocuments(filter);
-        const likes = await this.LikePostModel.find().sort({createdAt: -1})
+        const totalCount = await this.commentModel.countDocuments(filter);
+        const likes = await this.LikeCommentModel.find().sort({createdAt: -1})
 
         const items = posts.map((p) => {
-            const latestLikes = likes.filter(l => l.postId === String(p._id) && l.myStatus === LikeStatus.Like).slice(0, 3)
-            const currentLike = likes.find((l) => l.postId === String(p._id) && userId === l.userId)
-            return PostViewDto.mapToView(p, currentLike?.myStatus, latestLikes)
+            const currentLike = likes.find((l) => l.commentId === String(p._id) && userId === l.userId)
+            return CommentViewDto.mapToView(p, currentLike?.myStatus)
         });
 
         return PaginatedViewDto.mapToView({

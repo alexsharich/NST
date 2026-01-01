@@ -27,7 +27,6 @@ export class CommentsController {
 
     @UseGuards(AuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard)
     @Put(':commentId/like-status')
     async changeLikeCommentStatus(@Body() {likeStatus}: ChangeStatusDto, @Param('commentId') commentId: string, @Req() req: Request) {
         const user = req.user!

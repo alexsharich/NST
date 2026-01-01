@@ -51,6 +51,7 @@ export class PostsController {
         return this.postsService.createPost(createPostInputDto)
     }
 
+    @UseGuards(UserIdGuard)
     @UseGuards(AuthGuard)
     @Post(':postId/comments')
     async createPostForBlog(@Body() content: CreateNewCommentInputDto, @Req() req: Request, @Param('postId') postId: string) {
@@ -89,7 +90,7 @@ export class PostsController {
         return this.postsQueryRepository.getAll(queries, undefined, userId || undefined)
     }
 
-    
+
     @UseGuards(UserIdGuard)
     @Get(':postId/comments')
     async getCommentsForPost(@Param('postId') postId: string, @Query() queries: GetPostQueryParams, @Req() req: Request) {
