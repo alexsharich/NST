@@ -12,12 +12,12 @@ import {DomainExceptionCode} from "../../../../core/exceptions/domain-exceptions
 export class UsersQueryRepository {
     constructor(
         @InjectModel(User.name)
-        private UserModel: UserModelType,
+        private userModel: UserModelType,
     ) {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
-        const user = await this.UserModel.findOne({_id: id, deletedAt: null})
+        const user = await this.userModel.findOne({_id: id, deletedAt: null})
         if (!user) {
             throw new DomainException({code: DomainExceptionCode.NotFound, message: 'User not found'})
         }
@@ -43,13 +43,13 @@ export class UsersQueryRepository {
             });
         }
 
-        const users = await this.UserModel
+        const users = await this.userModel
             .find(filter)
             .sort({[queries.sortBy]: queries.sortDirection})
             .skip(queries.calculateSkip())
             .limit(queries.pageSize);
 
-        const totalCount = await this.UserModel.countDocuments(filter);
+        const totalCount = await this.userModel.countDocuments(filter);
 
         const items = users.map(UserViewDto.mapToView);
         return PaginatedViewDto.mapToView({

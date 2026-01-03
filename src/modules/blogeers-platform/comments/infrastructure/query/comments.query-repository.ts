@@ -4,17 +4,17 @@ import {Comment, CommentModelType} from "../../domain/comment.entity";
 import {CommentViewDto} from "../../api/view-dto/comment-view.dto";
 import {DomainException} from "../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../core/exceptions/domain-exceptions-codes";
-import {LikeCommentModelType} from "../../../likes/likes-comments/domain/like-comment.entity";
+import {LikeCommentModelType, LikeComment} from "../../../likes/likes-comments/domain/like-comment.entity";
 
 
 @Injectable()
 export class CommentsQueryRepository {
-    constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
-                @InjectModel(LikeComment.name) private readonly LikeComment: LikeCommentModelType) {
+    constructor(@InjectModel(Comment.name) private readonly commentModel: CommentModelType,
+                @InjectModel(LikeComment.name) private readonly likeComment: LikeCommentModelType) {
     }
 
     async getByIdOrNotFoundFail(id: string, userId?: string): Promise<CommentViewDto> {
-        const comment = await this.CommentModel.findOne({_id: id, deletedAt: null})
+        const comment = await this.commentModel.findOne({_id: id, deletedAt: null})
         if (!comment) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
@@ -22,7 +22,7 @@ export class CommentsQueryRepository {
             })
 
         }
-        const like = await this.LikeComment.findOne({userId, commentId: id})
+        const like = await this.likeComment.findOne({userId, commentId: id})
         const myStatus = like?.myStatus || undefined
         return CommentViewDto.mapToView(comment, myStatus)
     }

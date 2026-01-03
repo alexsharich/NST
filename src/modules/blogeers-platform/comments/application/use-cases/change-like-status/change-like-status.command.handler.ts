@@ -10,7 +10,7 @@ import {LikesRepository} from "../../../../likes/likes-comments/infrastructure/l
 
 @CommandHandler(ChangeLikeCommentStatusCommand)
 export class ChangeLikeStatusCommandHandler implements ICommandHandler<ChangeLikeCommentStatusCommand, void> {
-    constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
+    constructor(@InjectModel(Comment.name) private readonly commentModel: CommentModelType,
                 private readonly commentsRepository: CommentsRepository,
                 @InjectModel(LikeComment.name) private readonly likeCommentModel: LikeCommentModelType,
                 private readonly likeCommentsRepository: LikesRepository) {
@@ -18,7 +18,7 @@ export class ChangeLikeStatusCommandHandler implements ICommandHandler<ChangeLik
     }
 
     async execute({likeStatus, commentId, user}: ChangeLikeCommentStatusCommand) {
-        const comment = await this.CommentModel.findOne({_id: commentId, deletedAt: null})
+        const comment = await this.commentModel.findOne({_id: commentId, deletedAt: null})
         if (!comment) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

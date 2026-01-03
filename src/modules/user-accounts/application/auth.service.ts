@@ -104,7 +104,10 @@ export class AuthService {
         await this.usersRepository.save(user)
     }
 
-    async login({loginOrEmail, password}: Login): Promise<{ accessToken: string, refreshToken: string }> {
+    async login({loginOrEmail, password, deviceId}: Login & { deviceId: string }): Promise<{
+        accessToken: string,
+        refreshToken: string
+    }> {
         const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) {
             throw new DomainException({
@@ -119,7 +122,7 @@ export class AuthService {
                 message: 'Password or login or email is wrong123'
             })
         }
-        const {accessToken, refreshToken} = await this.jwtService.createToken(user.id)
+        const {accessToken, refreshToken} = this.jwtService.createToken(user.id, deviceId)
         return {accessToken, refreshToken}
     }
 

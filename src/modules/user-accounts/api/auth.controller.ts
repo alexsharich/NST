@@ -10,11 +10,18 @@ import {AuthGuard} from "../../../core/guards/auth.guard";
 import {Request, Response} from 'express'
 import {daysToMs} from "../../../helpers/days-to-ms";
 import {JwtService} from "../../../application/jwt.service";
+import {UAParser} from "ua-parser-js";
+import mongoose from "mongoose";
+import {DomainException} from "../../../core/exceptions/domain-exceptions";
+import {DomainExceptionCode} from "../../../core/exceptions/domain-exceptions-codes";
+import {CommandBus} from "@nestjs/cqrs";
+import {CreateDeviceCommand} from "../devices/application/use-cases/create-device/create-device.command";
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService,
-                private readonly jwtService: JwtService) {
+                private readonly jwtService: JwtService,
+                private readonly commandBus: CommandBus) {
 
     }
 
@@ -24,10 +31,31 @@ export class AuthController {
         return this.authService.registration(body)
     }
 
+
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    async login(@Body() body: Login, @Res() res: Response) {
-        const {accessToken, refreshToken} = await this.authService.login(body)
+    async login(@Body() body: Login, @Res() res: Response, @Req() req: Request) {
+        const deviceId = new mongoose.Types.ObjectId().toString()
+        const {accessToken, refreshToken} = await this.authService.login({...body, deviceId})
+
+        const ip = req.ip || '1'
+
+        const {browser, device} = UAParser(req.headers['user-agent']);
+
+        const deviceName = device.model || '' + browser.name || ''
+        const decoded = this.jwtService.decodeToken(refreshToken)
+
+        if (!decoded) {
+            throw new DomainException({
+                code: DomainExceptionCode.Unauthorized,
+                message: 'Not auth'
+            })
+
+        }
+        const iat = new Date(decoded.iat! * 1000).toISOString()
+        const userId = decoded.userId
+        await this.commandBus.execute(new CreateDeviceCommand(ip, deviceName, deviceId, iat, userId))
+
         res.cookie('refreshToken', refreshToken, {
             maxAge: (daysToMs(3)),
             httpOnly: true,

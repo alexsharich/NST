@@ -8,13 +8,13 @@ import {DomainExceptionCode} from "../../../../../../core/exceptions/domain-exce
 
 @CommandHandler(UpdateCommentCommand)
 export class UpdateCommentCommandHandler implements ICommandHandler<UpdateCommentCommand, void> {
-    constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
+    constructor(@InjectModel(Comment.name) private readonly commentModel: CommentModelType,
                 private readonly commentsRepository: CommentsRepository,) {
 
     }
 
     async execute({id, content, userId}: UpdateCommentCommand) {
-        const comment = await this.CommentModel.findOne({_id: id, deletedAt: null})
+        const comment = await this.commentModel.findOne({_id: id, deletedAt: null})
         if (!comment) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

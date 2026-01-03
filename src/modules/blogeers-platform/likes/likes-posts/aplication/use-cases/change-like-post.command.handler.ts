@@ -10,8 +10,8 @@ import {PostModelType, Post} from "../../../../posts/domain/post.entity";
 
 @CommandHandler(ChangeLikePostStatusCommand)
 export class ChangeLikePostCommandHandler implements ICommandHandler<ChangeLikePostStatusCommand, void> {
-    constructor(@InjectModel(LikePost.name) private readonly LikePostModel: LikePostModelType,
-                @InjectModel(Post.name) private readonly PostModel: PostModelType,
+    constructor(@InjectModel(LikePost.name) private readonly likePostModel: LikePostModelType,
+                @InjectModel(Post.name) private readonly postModel: PostModelType,
                 private readonly postsRepository: PostsRepository,
                 private readonly likesPostRepository: LikesPostRepository
     ) {
@@ -20,7 +20,7 @@ export class ChangeLikePostCommandHandler implements ICommandHandler<ChangeLikeP
 
 
     async execute({likeStatus, postId, user}: ChangeLikePostStatusCommand) {
-        const post = await this.PostModel.findById({_id: postId, deletedAt: null})
+        const post = await this.postModel.findById({_id: postId, deletedAt: null})
         if (!post) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
@@ -35,10 +35,10 @@ export class ChangeLikePostCommandHandler implements ICommandHandler<ChangeLikeP
             })
         }
         const userId = String(user._id)
-        const isLikePostExist = await this.LikePostModel.findOne({postId, userId})
+        const isLikePostExist = await this.likePostModel.findOne({postId, userId})
 
         if (!isLikePostExist) {
-            const newLikePost = this.LikePostModel.createLikePost(user, likeStatus, postId)
+            const newLikePost = this.likePostModel.createLikePost(user, likeStatus, postId)
             post.updateCounter(likeStatus)
             await Promise.all([this.likesPostRepository.save(newLikePost), this.postsRepository.save(post)])
             return

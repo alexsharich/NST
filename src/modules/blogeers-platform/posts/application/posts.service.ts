@@ -9,7 +9,7 @@ import {PostsQueryRepository} from "../infrastructure/query/posts-query-reposito
 
 @Injectable()
 export class PostsService {
-    constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType,
+    constructor(@InjectModel(Post.name) private readonly postModel: PostModelType,
                 private readonly postsQueryRepository: PostsQueryRepository,
                 private readonly blogsRepository: BlogsRepository,
                 private readonly postsRepository: PostsRepository) {
@@ -21,7 +21,7 @@ export class PostsService {
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
-        const post = this.PostModel.createInstance({
+        const post = this.postModel.createInstance({
             title,
             shortDescription,
             content,

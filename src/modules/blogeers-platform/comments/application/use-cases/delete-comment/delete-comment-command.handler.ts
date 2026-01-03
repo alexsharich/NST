@@ -8,14 +8,14 @@ import {CommentsRepository} from "../../../infrastructure/comments.repository";
 
 @CommandHandler(DeleteCommentCommand)
 export class DeleteCommentCommandHandler implements ICommandHandler<DeleteCommentCommand, void> {
-    constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType,
+    constructor(@InjectModel(Comment.name) private readonly commentModel: CommentModelType,
                 private readonly commentsRepository: CommentsRepository) {
 
     }
 
 
     async execute({id, userId}: DeleteCommentCommand) {
-        const comment = await this.CommentModel.findOne({_id: id, deletedAt: null})
+        const comment = await this.commentModel.findOne({_id: id, deletedAt: null})
 
         if (!comment) {
             throw new DomainException({

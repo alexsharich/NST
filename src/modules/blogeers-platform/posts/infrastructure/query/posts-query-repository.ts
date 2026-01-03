@@ -10,25 +10,23 @@ import {LikeStatus} from "../../../../../core/dto/like.status";
 import {Comment, CommentModelType} from "../../../comments/domain/comment.entity";
 import {LikeComment, LikeCommentModelType} from "../../../likes/likes-comments/domain/like-comment.entity";
 import {CommentViewDto} from "../../../comments/api/view-dto/comment-view.dto";
-import {PostsRepository} from "../posts.repository";
 
 @Injectable()
 export class PostsQueryRepository {
-    constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType,
-                @InjectModel(LikePost.name) private readonly LikePostModel: LikePostModelType,
+    constructor(@InjectModel(Post.name) private readonly postModel: PostModelType,
+                @InjectModel(LikePost.name) private readonly likePostModel: LikePostModelType,
                 @InjectModel(Comment.name) private readonly commentModel: CommentModelType,
-                @InjectModel(LikeComment.name) private readonly LikeCommentModel: LikeCommentModelType,
-                private readonly postsRepository: PostsRepository
+                @InjectModel(LikeComment.name) private readonly likeCommentModel: LikeCommentModelType,
     ) {
     }
 
     async getByIdOrNotFoundFail(id: string, userId?: string): Promise<PostViewDto> {
-        const post = await this.PostModel.findOne({_id: id, deletedAt: null})
+        const post = await this.postModel.findOne({_id: id, deletedAt: null})
 
         if (!post) {
             throw new NotFoundException('Post not found')
         }
-        const likes = await this.LikePostModel.find().sort({createdAt: -1})
+        const likes = await this.likePostModel.find().sort({createdAt: -1})
         const currentLike = likes.find((l) => l.postId === id && userId === l.userId)
         const latestLikes = likes.filter(l => l.postId === id && l.myStatus === LikeStatus.Like).slice(0, 3)
 
@@ -36,8 +34,7 @@ export class PostsQueryRepository {
     }
 
     async getCommentsForPost(postId: string, queries: GetPostQueryParams, userId?: string) {
-        // TODO ??
-        const post = await this.PostModel.findOne({_id: postId, deletedAt: null})
+        const post = await this.postModel.findOne({_id: postId, deletedAt: null})
         if (!post) {
             throw new NotFoundException('Post not found')
         }
@@ -62,7 +59,7 @@ export class PostsQueryRepository {
             .skip(queries.calculateSkip())
             .limit(queries.pageSize);
         const totalCount = await this.commentModel.countDocuments(filter);
-        const likes = await this.LikeCommentModel.find().sort({createdAt: -1})
+        const likes = await this.likeCommentModel.find().sort({createdAt: -1})
 
         const items = posts.map((p) => {
             const currentLike = likes.find((l) => l.commentId === String(p._id) && userId === l.userId)
@@ -93,14 +90,14 @@ export class PostsQueryRepository {
             });
         }
 
-        const posts = await this.PostModel//отфильтровать по id
+        const posts = await this.postModel//отфильтровать по id
             .find(filter)
             .sort({[queries.sortBy]: queries.sortDirection})
             .skip(queries.calculateSkip())
             .limit(queries.pageSize);
 
-        const totalCount = await this.PostModel.countDocuments(filter);
-        const likes = await this.LikePostModel.find().sort({createdAt: -1})
+        const totalCount = await this.postModel.countDocuments(filter);
+        const likes = await this.likePostModel.find().sort({createdAt: -1})
 
         const items = posts.map((p) => {
             const latestLikes = likes.filter(l => l.postId === String(p._id) && l.myStatus === LikeStatus.Like).slice(0, 3)

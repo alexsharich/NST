@@ -6,6 +6,7 @@ import {Injectable} from "@nestjs/common";
 interface MyJwtPayload extends JwtPayload {
     userId: string
     deviceId: string
+    iat: number
 }
 
 @Injectable()

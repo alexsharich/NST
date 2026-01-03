@@ -9,12 +9,12 @@ import {GetBlogsQueryParams} from "../../api/input-dto/get-blogs-query-params.in
 @Injectable()
 export class BlogsQueryRepository {
     constructor(
-        @InjectModel(Blog.name) private readonly BlogModel: BlogModelType
+        @InjectModel(Blog.name) private readonly blogModel: BlogModelType
     ) {
     }
 
     async getByIdOrNotFoundFail(id: string): Promise<BlogViewDto> {
-        const blog = await this.BlogModel.findOne({_id: id, deletedAt: null})
+        const blog = await this.blogModel.findOne({_id: id, deletedAt: null})
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
@@ -29,13 +29,13 @@ export class BlogsQueryRepository {
             filter.name = {$regex: queries.searchNameTerm, $options: 'i'}
         }
 
-        const blogs = await this.BlogModel
+        const blogs = await this.blogModel
             .find(filter)
             .sort({[queries.sortBy]: queries.sortDirection})
             .skip(queries.calculateSkip())
             .limit(queries.pageSize);
 
-        const totalCount = await this.BlogModel.countDocuments(filter);
+        const totalCount = await this.blogModel.countDocuments(filter);
 
         const items = blogs.map(BlogViewDto.mapToView);
         return PaginatedViewDto.mapToView({

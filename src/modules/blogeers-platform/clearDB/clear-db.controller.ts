@@ -9,17 +9,17 @@ import {User, UserModelType} from "../../user-accounts/domain/user.entity";
 @Controller('testing/all-data')
 export class ClearDBController {
     constructor(
-        @InjectModel(Blog.name) private readonly BlogModel: BlogModelType,
-        @InjectModel(Post.name) private readonly PostModel: PostModelType,
-        @InjectModel(User.name) private readonly UserModel: UserModelType,) {
+        @InjectModel(Blog.name) private readonly blogModel: BlogModelType,
+        @InjectModel(Post.name) private readonly postModel: PostModelType,
+        @InjectModel(User.name) private readonly userModel: UserModelType,) {
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete()
     async clearDataBase() {
-        await this.BlogModel.deleteMany({})
-        await this.PostModel.deleteMany({})
-        await this.UserModel.deleteMany({})
+        await this.blogModel.deleteMany({})
+        await this.postModel.deleteMany({})
+        await this.userModel.deleteMany({})
     }
 }
 
