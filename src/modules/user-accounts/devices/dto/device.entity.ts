@@ -38,6 +38,11 @@ export class Device {
         this.deletedAt = new Date();
     }
 
+    update(iat: string) {
+        this.updatedAt = new Date()
+        this.iat = iat
+    }
+
 
 }
 

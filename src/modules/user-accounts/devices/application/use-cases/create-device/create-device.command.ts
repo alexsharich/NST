@@ -4,6 +4,5 @@ export class CreateDeviceCommand {
                 public deviceId: string,
                 public iat: string,
                 public userId: string) {
-
     }
 }

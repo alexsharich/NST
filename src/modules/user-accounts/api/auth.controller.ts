@@ -16,6 +16,10 @@ import {DomainException} from "../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../core/exceptions/domain-exceptions-codes";
 import {CommandBus} from "@nestjs/cqrs";
 import {CreateDeviceCommand} from "../devices/application/use-cases/create-device/create-device.command";
+import {
+    DeleteDeviceByIdCommand
+} from "../devices/application/use-cases/delete-device-by-id/delete-device-by-id.command";
+import {UpdateDeviceCommand} from "../devices/application/use-cases/update-devace/update-device.command";
 
 @Controller('auth')
 export class AuthController {
@@ -65,17 +69,22 @@ export class AuthController {
         res.send({accessToken})
     }
 
+    //Todo refresh guard
     @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
-    async logout(@Res() res: Response) {
+    async logout(@Res() res: Response, @Req() req: Request) {
+        const deviceId = req.deviceId!
+        const userId = req.userId!
+        await this.commandBus.execute(new DeleteDeviceByIdCommand(deviceId, userId))
         res.clearCookie('refreshToken')
         res.send()
     }
 
+    //Todo refresh guard
     @Post('refresh-token')
     async refreshToken(@Req() req: Request, @Res() res: Response) {
-        const userId = req.userId
-        const deviceId = req.deviceId
+        const userId = req.userId!
+        const deviceId = req.deviceId!
         if (!userId) {
             res.sendStatus(401)
             return
@@ -83,12 +92,14 @@ export class AuthController {
 
 
         const {accessToken, refreshToken} = this.jwtService.createToken(userId, String(deviceId))
-        const tokenDecoded = this.jwtService.decodeToken(refreshToken)
+        const decoded = this.jwtService.decodeToken(refreshToken)
 
-        if (!tokenDecoded) {
+        if (!decoded) {
             res.sendStatus(401)
             return
         }
+        const iat = new Date(decoded.iat! * 1000).toISOString()
+        await this.commandBus.execute(new UpdateDeviceCommand(decoded.deviceId, iat))
 
         res.cookie('refreshToken', refreshToken, {
             maxAge: (daysToMs(3)),
