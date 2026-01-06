@@ -22,7 +22,8 @@ import {DevicesQueryRepository} from "./devices/infrastucture/query/devices.quer
         MongooseModule.forFeature([{name: User.name, schema: UserSchema}, {
             name: Device.name,
             schema: DeviceSchema
-        }]), MailModule
+        }]),
+        MailModule
     ],
     controllers: [UsersController, AuthController, DevicesController],
     providers: [

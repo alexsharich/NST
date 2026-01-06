@@ -5,22 +5,18 @@ import {DeviceModelType, Device} from "../../../dto/device.entity";
 import {DomainException} from "../../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../../core/exceptions/domain-exceptions-codes";
 import {DevicesRepository} from "../../../infrastucture/devices.repository";
+import {DevicesQueryRepository} from "../../../infrastucture/query/devices.query.repository";
 
 @CommandHandler(DeleteDeviceByIdCommand)
 export class DeleteDeviceByIdCommandHandler implements ICommandHandler<DeleteDeviceByIdCommand, void> {
     constructor(@InjectModel(Device.name) public readonly deviceModel: DeviceModelType,
-                private readonly devicesRepository: DevicesRepository) {
+                private readonly devicesRepository: DevicesRepository,
+                private readonly devicesQueryRepository: DevicesQueryRepository) {
 
     }
 
     async execute({deviceId, userId}: DeleteDeviceByIdCommand) {
-        //await this.deviceModel.deleteOne({_id: deviceId, deletedAt: null})
-        // TODO добавить репу
-        const device = await this.deviceModel.findOne({
-            _id: deviceId,
-            userId,
-            deletedAt: null
-        })
+        const device = await this.devicesQueryRepository.getDeviceById(userId, deviceId)
         if (!device) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

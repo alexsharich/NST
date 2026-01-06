@@ -20,6 +20,7 @@ import {
     DeleteDeviceByIdCommand
 } from "../devices/application/use-cases/delete-device-by-id/delete-device-by-id.command";
 import {UpdateDeviceCommand} from "../devices/application/use-cases/update-devace/update-device.command";
+import {RefreshTokenGuard} from "../../../core/guards/refresh.token.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -69,7 +70,7 @@ export class AuthController {
         res.send({accessToken})
     }
 
-    //Todo refresh guard
+    @UseGuards(RefreshTokenGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
     async logout(@Res() res: Response, @Req() req: Request) {
@@ -80,7 +81,7 @@ export class AuthController {
         res.send()
     }
 
-    //Todo refresh guard
+    @UseGuards(RefreshTokenGuard)
     @Post('refresh-token')
     async refreshToken(@Req() req: Request, @Res() res: Response) {
         const userId = req.userId!
@@ -99,7 +100,7 @@ export class AuthController {
             return
         }
         const iat = new Date(decoded.iat! * 1000).toISOString()
-        await this.commandBus.execute(new UpdateDeviceCommand(decoded.deviceId, iat))
+        await this.commandBus.execute(new UpdateDeviceCommand(decoded.deviceId, iat, userId))
 
         res.cookie('refreshToken', refreshToken, {
             maxAge: (daysToMs(3)),

@@ -12,4 +12,12 @@ export class DevicesQueryRepository {
         const devices = await this.deviceModel.find({userId})
         return devices.map(dev => CreateDeviceViewDto.mapToView(dev))
     }
+
+    async getDeviceById(userId: string, deviceId: string) {
+        return this.deviceModel.findOne({_id: deviceId, userId, deletedAt: null}) //todo deletedAt???
+    }
+
+    async getAllDevices(userId: string): Promise<any> {//todo fix any
+        return this.deviceModel.find({userId, deletedAt: null})//todo deletedAt???
+    }
 }
