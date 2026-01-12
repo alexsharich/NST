@@ -1,4 +1,3 @@
-import {IsStringWithTrim} from "../../../../../core/decorators/validation/is-string-with-string";
 import {
     contentConstraints,
     shortDescriptionConstraints,

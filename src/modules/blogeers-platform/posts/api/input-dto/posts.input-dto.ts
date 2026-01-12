@@ -1,4 +1,3 @@
-import {IsStringWithTrim} from "../../../../../core/decorators/validation/is-string-with-string";
 import {
     contentConstraints,
     shortDescriptionConstraints,
@@ -6,7 +5,6 @@ import {
 } from "../../domain/dto/create-post.domain.dto";
 import {IsNotEmpty, IsString, Length} from "class-validator";
 import {Trim} from "../../../../../core/decorators/transform/trim";
-import {nameConstraints} from "../../../blogs/domain/dto/create-blog.domain.dto";
 
 export class CreatePostInputDto {
     @IsNotEmpty()
