@@ -16,6 +16,13 @@ import {CreateDeviceCommandHandler} from "./devices/application/use-cases/create
 import {DeviceSchema, Device} from "./devices/dto/device.entity";
 import {DevicesRepository} from "./devices/infrastucture/devices.repository";
 import {DevicesQueryRepository} from "./devices/infrastucture/query/devices.query.repository";
+import {UpdateDeviceCommandHandler} from "./devices/application/use-cases/update-device/update-device-command.handler";
+import {
+    DeleteDeviceByIdCommandHandler
+} from "./devices/application/use-cases/delete-device-by-id/delete-device-by-id-command.handler";
+import {
+    DeleteDevicesCommandHandler
+} from "./devices/application/use-cases/delete-devices/delete-devices.command.handler";
 
 @Module({
     imports: [
@@ -32,6 +39,9 @@ import {DevicesQueryRepository} from "./devices/infrastucture/query/devices.quer
         UsersService,
         UsersRepository,
         UsersQueryRepository,
+        UpdateDeviceCommandHandler,
+        DeleteDeviceByIdCommandHandler,
+        DeleteDevicesCommandHandler,
         SecurityDevicesQueryRepository,
         AuthQueryRepository,
         CreateDeviceCommandHandler,

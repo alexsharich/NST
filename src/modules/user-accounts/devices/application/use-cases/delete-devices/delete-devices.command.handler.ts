@@ -16,6 +16,7 @@ export class DeleteDevicesCommandHandler implements ICommandHandler<DeleteDevice
 
     async execute(userId: DeleteDevicesCommand) {
         const devices = await this.devicesQueryRepository.getAllDevices(userId.userId)
+        console.log('DEVICES', devices)
         if (!devices) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

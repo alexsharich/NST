@@ -9,7 +9,6 @@ import {JwtService} from "../../../application/jwt.service";
 import {Login} from "../api/input-dto/login";
 import {UsersQueryRepository} from "../infrastructure/query/users.query-repository";
 import {NewPasswordType} from "../api/input-dto/new-password";
-import {UserViewDto} from "../api/view-dto/users.view-dto";
 import {RegistrationConfirmationCode} from "../api/input-dto/registration-confirmation-code";
 import {Mailer} from "../../mail/application/mail.service";
 import {add} from "date-fns";
@@ -54,9 +53,6 @@ export class AuthService {
 
         const expirationDate = new Date(oneHourLaterMillis);
         const confirmationCode = randomUUID()
-        console.log('DATE EXP', expirationDate)
-        console.log('DATE NOW', now)
-        console.log('CODE', confirmationCode)
         const newUser = this.userModel.createInstance({login, passwordHash, email}, confirmationCode, expirationDate)
         await this.usersRepository.save(newUser)
 
@@ -126,9 +122,9 @@ export class AuthService {
         return {accessToken, refreshToken}
     }
 
-    async me(userId: string): Promise<Omit<UserViewDto, 'createdAt'>> {
-        const {createdAt, ...rest} = await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
-        return rest
+    async me(userId: string) {
+        const {createdAt, id, ...rest} = await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
+        return {userId: id, ...rest}
     }
 
     async newPassword({newPassword, recoveryCode}: NewPasswordType) {

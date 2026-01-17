@@ -20,11 +20,11 @@ export class JwtService {
     }
 
     createToken(userId: string, deviceId?: string) {
-        const accessToken = jwt.sign({userId}, this.JWT_ACCESS, {expiresIn: '300s'})
+        const accessToken = jwt.sign({userId}, this.JWT_ACCESS, {expiresIn: '10s'})
         const refreshToken = jwt.sign({
             userId,
             deviceId
-        }, this.JWT_REFRESH, {expiresIn: '600s'})
+        }, this.JWT_REFRESH, {expiresIn: '20s'})
         return {accessToken, refreshToken}
     }
 

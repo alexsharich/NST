@@ -5,6 +5,7 @@ import {CreateDeviceDto} from "../domain/create-device/create-device-dto";
 
 @Schema({timestamps: true})
 export class Device {
+
     @Prop({type: String, required: true})
     ip: string;
 
@@ -25,10 +26,10 @@ export class Device {
 
     static createInstance(dto: CreateDeviceDto): DeviceDocument {
         const device = new this();
+        device.userId = dto.userId
         device.ip = dto.ip
         device.title = dto.title
         device.iat = dto.iat
-        device.userId = dto.userId
 
         return device as DeviceDocument;
     }

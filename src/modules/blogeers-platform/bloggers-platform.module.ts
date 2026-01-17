@@ -37,12 +37,21 @@ import {LikesRepository} from "./likes/likes-comments/infrastructure/like-commen
 import {ChangeLikePostCommandHandler} from "./likes/likes-posts/aplication/use-cases/change-like-post.command.handler";
 import {LikePost, LikePostSchema} from "./likes/likes-posts/domain/like-post.entity";
 import {LikesPostRepository} from "./likes/likes-posts/infrastructure/like-post.repository";
+import {ThrottlerModule} from "@nestjs/throttler";
 
 const commands = [CreateCommandHandler, UpdateCommentCommandHandler, ChangeLikeStatusCommandHandler, DeleteCommentCommandHandler, ChangeLikePostCommandHandler]
 const queries = [GetCommentByIdQueryHandler, GetCommentsForPostQueryHandler]
 
 @Module({
     imports: [UserAccountsModule,
+        ThrottlerModule.forRoot({
+            throttlers: [
+                {
+                    ttl: 10000,
+                    limit: 5,
+                },
+            ],
+        }),
         MongooseModule.forFeature([
             {
                 name: Blog.name,

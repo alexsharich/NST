@@ -31,7 +31,7 @@ export class RefreshTokenGuard implements CanActivate {
         const userId = token.userId
         const iat = token.iat
         const deviceId = token.deviceId
-        const device = await this.devicesQueryRepository.getDeviceById(userId, deviceId)
+        const device = await this.devicesQueryRepository.getDeviceById(deviceId)
 
         if (!device) {
             throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
@@ -39,7 +39,7 @@ export class RefreshTokenGuard implements CanActivate {
         if (device.userId !== userId) {
             throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
         }
-        if (device.userId !== new Date(iat * 1000).toISOString()) {
+        if (device.iat !== new Date(iat * 1000).toISOString()) {
             throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
         }
 

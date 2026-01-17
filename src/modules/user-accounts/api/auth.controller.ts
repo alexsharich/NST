@@ -19,9 +19,11 @@ import {CreateDeviceCommand} from "../devices/application/use-cases/create-devic
 import {
     DeleteDeviceByIdCommand
 } from "../devices/application/use-cases/delete-device-by-id/delete-device-by-id.command";
-import {UpdateDeviceCommand} from "../devices/application/use-cases/update-devace/update-device.command";
+import {UpdateDeviceCommand} from "../devices/application/use-cases/update-device/update-device.command";
 import {RefreshTokenGuard} from "../../../core/guards/refresh.token.guard";
+import {ThrottlerGuard} from "@nestjs/throttler";
 
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService,
@@ -62,7 +64,7 @@ export class AuthController {
         await this.commandBus.execute(new CreateDeviceCommand(ip, deviceName, deviceId, iat, userId))
 
         res.cookie('refreshToken', refreshToken, {
-            maxAge: (daysToMs(3)),
+            maxAge: 21,
             httpOnly: true,
             secure: true
         })
@@ -77,10 +79,14 @@ export class AuthController {
         const deviceId = req.deviceId!
         const userId = req.userId!
         await this.commandBus.execute(new DeleteDeviceByIdCommand(deviceId, userId))
-        res.clearCookie('refreshToken')
+        res.cookie('refreshToken', {
+            httpOnly: true,
+            secure: true
+        })
         res.send()
     }
 
+    @HttpCode(HttpStatus.OK)
     @UseGuards(RefreshTokenGuard)
     @Post('refresh-token')
     async refreshToken(@Req() req: Request, @Res() res: Response) {
@@ -103,7 +109,7 @@ export class AuthController {
         await this.commandBus.execute(new UpdateDeviceCommand(decoded.deviceId, iat, userId))
 
         res.cookie('refreshToken', refreshToken, {
-            maxAge: (daysToMs(3)),
+            maxAge: 21,
             httpOnly: true,
             secure: true
         })

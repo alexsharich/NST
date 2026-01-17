@@ -17,7 +17,7 @@ export class UpdateDeviceCommandHandler implements ICommandHandler<UpdateDeviceC
     }
 
     async execute({deviceId, iat, userId}: UpdateDeviceCommand) {
-        const device = await this.devicesQueryRepository.getDeviceById(userId, deviceId)
+        const device = await this.devicesQueryRepository.getDeviceById(deviceId)
         if (!device) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,

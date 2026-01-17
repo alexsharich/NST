@@ -16,7 +16,14 @@ export class DeleteDeviceByIdCommandHandler implements ICommandHandler<DeleteDev
     }
 
     async execute({deviceId, userId}: DeleteDeviceByIdCommand) {
-        const device = await this.devicesQueryRepository.getDeviceById(userId, deviceId)
+        if (!deviceId) {
+            throw new DomainException({
+                code: DomainExceptionCode.BadRequest,
+                message: 'Bad Request'
+            })
+        }
+        const device = await this.devicesQueryRepository.getDeviceById(deviceId)
+        console.log('DEVICE IS EXIST', device)
         if (!device) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
