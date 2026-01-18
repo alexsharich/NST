@@ -14,9 +14,9 @@ export class DeleteDevicesCommandHandler implements ICommandHandler<DeleteDevice
                 private readonly devicesQueryRepository: DevicesQueryRepository) {
     }
 
-    async execute(userId: DeleteDevicesCommand) {
-        const devices = await this.devicesQueryRepository.getAllDevices(userId.userId)
-        console.log('DEVICES', devices)
+    async execute({userId, deviceId}: DeleteDevicesCommand) {
+
+        const devices = await this.devicesQueryRepository.getAllDevices(userId)
         if (!devices) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
@@ -24,8 +24,10 @@ export class DeleteDevicesCommandHandler implements ICommandHandler<DeleteDevice
             })
         }
         for (const device of devices) {
-            device.makeDeleted();
-            await this.devicesRepository.save(device);
+            if (device.id.toString() !== deviceId) {
+                device.makeDeleted()
+                await this.devicesRepository.save(device);
+            }
         }
     }
 

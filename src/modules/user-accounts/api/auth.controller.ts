@@ -58,7 +58,10 @@ export class AuthController {
                 message: 'Not auth'
             })
 
+
         }
+        console.log('new DEVICE', device)
+
         const iat = new Date(decoded.iat! * 1000).toISOString()
         const userId = decoded.userId
         await this.commandBus.execute(new CreateDeviceCommand(ip, deviceName, deviceId, iat, userId))
@@ -79,9 +82,10 @@ export class AuthController {
         const deviceId = req.deviceId!
         const userId = req.userId!
         await this.commandBus.execute(new DeleteDeviceByIdCommand(deviceId, userId))
-        res.cookie('refreshToken', {
+        res.cookie('refreshToken', '', {
             httpOnly: true,
-            secure: true
+            secure: true,
+            expires: new Date(0)
         })
         res.send()
     }

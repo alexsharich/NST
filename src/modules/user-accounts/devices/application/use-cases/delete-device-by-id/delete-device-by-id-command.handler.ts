@@ -1,7 +1,7 @@
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
 import {DeleteDeviceByIdCommand} from "./delete-device-by-id.command";
 import {InjectModel} from "@nestjs/mongoose";
-import {DeviceModelType, Device} from "../../../dto/device.entity";
+import {Device, DeviceModelType} from "../../../dto/device.entity";
 import {DomainException} from "../../../../../../core/exceptions/domain-exceptions";
 import {DomainExceptionCode} from "../../../../../../core/exceptions/domain-exceptions-codes";
 import {DevicesRepository} from "../../../infrastucture/devices.repository";
@@ -23,11 +23,16 @@ export class DeleteDeviceByIdCommandHandler implements ICommandHandler<DeleteDev
             })
         }
         const device = await this.devicesQueryRepository.getDeviceById(deviceId)
-        console.log('DEVICE IS EXIST', device)
         if (!device) {
             throw new DomainException({
                 code: DomainExceptionCode.NotFound,
                 message: 'Device not found'
+            })
+        }
+        if (device.userId !== userId) {
+            throw new DomainException({
+                code: DomainExceptionCode.Forbidden,
+                message: 'Forbidden'
             })
         }
         device.makeDeleted()

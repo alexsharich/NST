@@ -16,18 +16,28 @@ export class AuthGuard implements CanActivate {
         const request: Request = context.switchToHttp().getRequest()
         const auth = request.headers['authorization']
         if (!auth) {
-            throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
+            throw new DomainException({
+                code: DomainExceptionCode.Unauthorized,
+                message: 'Unauthorized auth'
+            })
         }
         const token = auth.split(' ')[1]
         const payload = this.jwtService.verifyToken(token)
         if (!payload) {
-            throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
+            throw new DomainException({
+                code: DomainExceptionCode.Unauthorized,
+                message: 'Unauthorized pay'
+            })
         }
         request.userId = payload!.userId
         const isUserExist = await this.usersRepository.findOne(request!.userId)
         if (!isUserExist) {
-            throw new DomainException({code: DomainExceptionCode.Unauthorized, message: 'Unauthorized'})
+            throw new DomainException({
+                code: DomainExceptionCode.Unauthorized,
+                message: 'Unauthorized is user exist'
+            })
         }
+        console.log('isUserExist', isUserExist)
         request.user = isUserExist
         return true
     }

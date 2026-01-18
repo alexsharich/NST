@@ -8,6 +8,7 @@ import {DevicesQueryRepository} from "../infrastucture/query/devices.query.repos
 import {CommandBus} from "@nestjs/cqrs";
 import {DeleteDeviceByIdCommand} from "../application/use-cases/delete-device-by-id/delete-device-by-id.command";
 import {DeleteDevicesCommand} from "../application/use-cases/delete-devices/delete-devices.command";
+import {RefreshTokenGuard} from "../../../../core/guards/refresh.token.guard";
 
 @Controller('security/devices')
 export class DevicesController {
@@ -16,7 +17,7 @@ export class DevicesController {
                 private readonly commandBus: CommandBus) {
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(RefreshTokenGuard)
     @Get()
     async getAllDevices(@Req() req: Request): Promise<CreateDeviceViewDto[]> {
         const userId = req.userId!
@@ -24,15 +25,16 @@ export class DevicesController {
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard)
+    @UseGuards(RefreshTokenGuard)
     @Delete()
     async deleteAllDevices(@Req() req: Request) {
         const userId = req.userId!
-        return this.commandBus.execute(new DeleteDevicesCommand(userId))
+        const deviceId = req.deviceId!
+        return this.commandBus.execute(new DeleteDevicesCommand(userId, deviceId))
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
-    @UseGuards(AuthGuard)
+    @UseGuards(RefreshTokenGuard)
     @Delete(':deviceId')
     async deleteDevice(@Param('deviceId') deviceId: string, @Req() req: Request) {
         const userId = req.userId!

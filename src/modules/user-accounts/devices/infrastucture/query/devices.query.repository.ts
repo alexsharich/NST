@@ -16,7 +16,7 @@ export class DevicesQueryRepository {
 
     async getDeviceById(deviceId: string) {
         const id = new Types.ObjectId(deviceId)
-        return this.deviceModel.find({_id: id, deletedAt: null})
+        return this.deviceModel.findOne({_id: id, deletedAt: null})
     }
 
     async getAllDevices(userId: string): Promise<any> {//todo fix any
