@@ -37,7 +37,6 @@ export class AuthGuard implements CanActivate {
                 message: 'Unauthorized is user exist'
             })
         }
-        console.log('isUserExist', isUserExist)
         request.user = isUserExist
         return true
     }

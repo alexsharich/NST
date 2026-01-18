@@ -1,5 +1,4 @@
 import {Controller, Delete, Get, HttpCode, HttpStatus, Param, Req, UseGuards} from '@nestjs/common';
-import {AuthGuard} from "../../../../core/guards/auth.guard";
 import {InjectModel} from "@nestjs/mongoose";
 import {DeviceModelType, Device} from "../dto/device.entity";
 import {CreateDeviceViewDto} from "../domain/create-device-view-dto/create-device-view-dto";

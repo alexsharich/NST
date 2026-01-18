@@ -60,7 +60,6 @@ export class AuthController {
 
 
         }
-        console.log('new DEVICE', device)
 
         const iat = new Date(decoded.iat! * 1000).toISOString()
         const userId = decoded.userId
