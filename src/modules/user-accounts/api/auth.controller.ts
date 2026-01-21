@@ -8,7 +8,6 @@ import {AuthService} from "../application/auth.service";
 import {Login} from "./input-dto/login";
 import {AuthGuard} from "../../../core/guards/auth.guard";
 import {Request, Response} from 'express'
-import {daysToMs} from "../../../helpers/days-to-ms";
 import {JwtService} from "../../../application/jwt.service";
 import {UAParser} from "ua-parser-js";
 import mongoose from "mongoose";
