@@ -24,7 +24,6 @@ export class Comment {
     @Prop({type: Date, nullable: true})
     deletedAt: Date | null;
 
-    //TODO DTO
     static createComment(dto: any) {
         const comment = new this()
         comment.content = dto.content
