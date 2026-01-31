@@ -37,7 +37,6 @@ export function pipesSetup(app: INestApplication) {
             stopAtFirstError: true,
             exceptionFactory: (errors) => {
                 const formattedErrors = errorFormatter(errors);
-
                 throw new DomainException({
                     code: DomainExceptionCode.ValidationError,
                     extensions: formattedErrors,
