@@ -15,6 +15,11 @@ export class BlogsQueryRepository {
 
     async getByIdOrNotFoundFail(id: string): Promise<BlogViewDto> {
         const blog = await this.blogModel.findOne({_id: id, deletedAt: null})
+
+        /*
+        SELECT * FROM blogs WHERE id=id AND "createdAt" IS NULL
+        * */
+
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
@@ -22,6 +27,21 @@ export class BlogsQueryRepository {
     }
 
     async getAll(queries: GetBlogsQueryParams) {
+        /*
+        SELECT *
+        FROM blogs
+        WHERE deletedAt IS NULL
+        AND ("blogName" ILIKE '%' || :searchNameTerm || '%' OR :searchNameTerm IS NULL) -- фильтрация по имени
+        ORDER BY
+            CASE
+        WHEN :sortBy = 'blogName' THEN "blogName"
+        WHEN :sortBy = 'createdAt' THEN "createdAt"
+        ELSE "id" -- значение по умолчанию для сортировки
+            END
+            :sortDirection
+        LIMIT :pageSize OFFSET :calculateSkip
+        * */
+
         const filter: FilterQuery<Blog> = {
             deletedAt: null,
         };

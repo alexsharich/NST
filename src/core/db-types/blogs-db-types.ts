@@ -9,12 +9,13 @@ export type BlogDbType = {
     userId?: string
 }
 /*
-CREATE TABLE blogs(
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+CREATE TABLE blogs (
+    id SERIAL PRIMARY KEY,
     "blogName" varchar COLLATE "C",
     "description" varchar,
     "websiteUrl" varchar,
     "isMembership" boolean DEFAULT false,
     "deletedAt" varchar,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
 )*/

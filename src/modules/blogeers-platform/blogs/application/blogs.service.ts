@@ -10,7 +10,6 @@ import {PostsRepository} from "../../posts/infrastructure/posts.repository";
 import {CreatePostForSelectedBlogInputDto} from "../api/input-dto/create-post-for-blog.input-dto";
 import {PostsQueryRepository} from "../../posts/infrastructure/query/posts-query-repository";
 import {GetBlogsQueryParams} from "../api/input-dto/get-blogs-query-params.input-dto";
-import {PostViewDto} from "../../posts/api/view-dto/post.view-dto";
 
 @Injectable()
 export class BlogsService {
@@ -24,6 +23,10 @@ export class BlogsService {
 
     async createBlog({websiteUrl, description, name}: CreateBlogInputDto): Promise<string> {
         const blog = this.BlogModel.createInstance({websiteUrl, description, name})
+        /*
+        INSERT INTO blogs ("blogName", "description", "websiteUrl", "isMembership", "deletedAt", "createdAt")
+        VALUES (name, 'description', 'websiteUrl', false, NULL, CURRENT_TIMESTAMP);
+        * */
         return this.blogsRepository.save(blog)
     }
 
@@ -53,19 +56,34 @@ export class BlogsService {
     }
 
     async deleteBlog(id: string) {
+
         const blog = await this.blogsRepository.findOne(id)
+        /*
+        SELECT FROM blogs WHERE id = id
+        * */
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
+        /*
+            DELETE FROM blogs WHERE id = id
+       * */
         blog.makeDeleted()
         await this.blogsRepository.save(blog)
     }
 
     async updateBlog(id: string, updateBlogInputDto: UpdateBlogInputDto) {
         const blog = await this.blogsRepository.findOne(id)
+        /*
+         SELECT FROM blogs WHERE id = id
+        * */
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
+        /*
+         UPDATE blogs
+            SET 'blogName' = 'updateBlog', 'description' = 'updateBlogInputDto', 'websiteUrl' = 'www'
+            WHERE id = 1;
+        * */
         blog.update(updateBlogInputDto)
         await this.blogsRepository.save(blog)
     }
