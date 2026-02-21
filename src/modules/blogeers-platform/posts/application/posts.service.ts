@@ -37,6 +37,9 @@ export class PostsService {
         if (!post) {
             throw new NotFoundException('Post not found')
         }
+        /*
+        DELETE FROM posts WHERE id = id
+        * */
         post.makeDeleted()
         await this.postsRepository.save(post)
     }

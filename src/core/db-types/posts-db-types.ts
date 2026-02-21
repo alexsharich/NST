@@ -14,7 +14,7 @@ export type PostDbType = {
 
 /*
 CREATE TABLE posts (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     short_description VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,

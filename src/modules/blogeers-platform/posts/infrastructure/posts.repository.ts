@@ -14,6 +14,9 @@ export class PostsRepository {
     }
 
     async findOne(id: string) {
+        /*
+        SELECT * FROM posts WHERE id = id AND deletedAt NOT NULL
+        * */
         return this.postModel.findOne({_id: id, deletedAt: null})
     }
 }

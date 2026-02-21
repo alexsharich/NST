@@ -14,6 +14,9 @@ export class BlogsRepository {
     }
 
     async findOne(id: string) {
+        /*
+        SELECT FROM blogs WHERE id = id AND "deletedAt" IS NULL
+        * */
         return this.blogModel.findOne({_id: id, deletedAt: null})
     }
 }

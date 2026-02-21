@@ -58,14 +58,17 @@ export class BlogsService {
     async deleteBlog(id: string) {
 
         const blog = await this.blogsRepository.findOne(id)
-        /*
-        SELECT FROM blogs WHERE id = id
-        * */
+
         if (!blog) {
             throw new NotFoundException('Blog not found')
         }
+        const now = new Date().getTime()
         /*
             DELETE FROM blogs WHERE id = id
+
+            UPDATE blogs
+            SET 'deletedAt' = now
+            WHERE id = 1;
        * */
         blog.makeDeleted()
         await this.blogsRepository.save(blog)
