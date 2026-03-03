@@ -21,6 +21,7 @@ export class ClearDBController {
         await this.postModel.deleteMany({})
         await this.userModel.deleteMany({})
     }
+
 }
 
 

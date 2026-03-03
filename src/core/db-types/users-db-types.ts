@@ -24,7 +24,7 @@ export type UserDbType = {
 
 /*
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     login VARCHAR(255) NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,

@@ -87,30 +87,4 @@ export class UsersRawRepository {
         )
         return res?.rows?.[0]
     }
-
-
-    /*async findOne(id: string) {
-        return this.userModel.findOne({_id: id, deletedAt: null})
-    } //done
-
-    async findUserByLogin(login: string) {
-        return this.userModel.findOne({login, deletedAt: null})
-    }
-
-    async findUserByLoginOrEmail(loginOrEmail: string) {
-        return this.userModel.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
-    }
-
-    async findUserByEmail(email: string) {
-        return this.userModel.findOne({email, deletedAt: null})
-    }
-
-    async findUserByConfirmationCode(confirmationCode: RegistrationConfirmationCode) {
-        return this.userModel.findOne({'emailConfirmation.confirmationCode': confirmationCode.code})
-    }
-
-    async findUserByRecoveryCode(recoveryCode: string) {
-        return this.userModel.findOne({'passwordRecovery.recoveryCode': recoveryCode})
-    }*/
-
 }

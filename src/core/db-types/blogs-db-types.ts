@@ -10,7 +10,7 @@ export type BlogDbType = {
 }
 /*
 CREATE TABLE blogs (
-    id SERIAL PRIMARY KEY,
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     "blogName" varchar COLLATE "C",
     "description" varchar,
     "websiteUrl" varchar,

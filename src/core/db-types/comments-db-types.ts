@@ -13,8 +13,8 @@ export type CommentDbType = {
 
 /*
 CREATE TABLE comments (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    content TEXT NOT NULL,
+id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+content TEXT NOT NULL,
 post_id VARCHAR(255) NOT NULL,
 user_id VARCHAR(255) NOT NULL,
 user_login VARCHAR(255) NOT NULL,
