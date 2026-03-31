@@ -9,7 +9,8 @@ import {BasicGuard} from "../../../core/guards/basic.guard";
 @Controller('users')
 export class UsersController {
     constructor(private readonly userService: UsersService,
-                private readonly usersQueryRepository: UsersQueryRepository) {
+                private readonly usersQueryRepository: UsersQueryRepository
+    ) {
     }
 
     @Post()
