@@ -7,7 +7,7 @@ export class UsersRawRepository {
 
     }
 
-    async createUser(login: string, passwordHash: string, email: string) {
+    async createUserSQL(login: string, passwordHash: string, email: string) {
         const res = await this.pgService.runQuery<{ id: string }>(`
             INSERT INTO users (login, "passwordHash", email)
             VALUES ($1, $2, $3) RETURNING id
@@ -21,7 +21,6 @@ export class UsersRawRepository {
                 SELECT id, login, email, "createdAt"
                 FROM users
                 WHERE id = $1
-                /*RETURNING id, login, email, "createdAt"*/
             `, [userId]
         )
         return res?.rows?.[0]
@@ -33,7 +32,7 @@ export class UsersRawRepository {
                 SELECT id, login, email, "createdAt"
                 FROM users
                 WHERE login = $1
-                /*RETURNING id, login, email, "createdAt"*/
+               
             `, [login]
         )
         return res?.rows?.[0]
@@ -46,7 +45,6 @@ export class UsersRawRepository {
                 FROM users
                 WHERE login = $1
                    OR email = $1
-                /*RETURNING id, login, email, "createdAt"*/
             `, [loginOrEmail]
         )
         return res?.rows?.[0]
@@ -58,7 +56,6 @@ export class UsersRawRepository {
                 SELECT id, login, email, "createdAt"
                 FROM users
                 WHERE email = $1
-                /*RETURNING id, login, email, "createdAt"*/
             `, [email]
         )
         return res?.rows?.[0]
@@ -70,7 +67,6 @@ export class UsersRawRepository {
                 SELECT id, login, email, "createdAt"
                 FROM users
                 WHERE "emailConfirmation"."confirmationCode" = $1
-                /*RETURNING id, login, email, "createdAt"*/
             `, [confirmationCode]
         )
         return res?.rows?.[0]
@@ -82,9 +78,16 @@ export class UsersRawRepository {
                 SELECT id, login, email, "createdAt"
                 FROM users
                 WHERE "passwordRecovery"."recoveryCode" = $1
-                /*RETURNING id, login, email, "createdAt"*/
             `, [recoveryCode]
         )
         return res?.rows?.[0]
+    }
+    async deleteUserSQL(id: string): Promise<boolean> {
+        const res = await this.pgService.runQuery(`
+        UPDATE users 
+        SET "deletedAt" = NOW() 
+        WHERE id = $1 AND "deletedAt" IS NULL
+    `, [id]);
+        return (res?.rowCount ?? 0) > 0;
     }
 }
