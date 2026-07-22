@@ -14,11 +14,15 @@ import {Mailer} from "../../mail/application/mail.service";
 import {add} from "date-fns";
 import {randomUUID} from 'crypto'
 import {InjectModel} from "@nestjs/mongoose";
+import {UsersRawRepository} from "../infrastructure/user.raw.repository";
+import {UsersQueryRawRepository} from "../infrastructure/query/users.query.raw-repository";
 
 @Injectable()
 export class AuthService {
     constructor(private readonly usersRepository: UsersRepository,
                 private readonly usersQueryRepository: UsersQueryRepository,
+                private readonly usersRawRepository: UsersRawRepository,
+                private readonly usersQueryRawRepository: UsersQueryRawRepository,
                 @InjectModel(User.name) private readonly userModel: UserModelType,
                 private readonly jwtService: JwtService,
                 private readonly mailer: Mailer
@@ -27,7 +31,8 @@ export class AuthService {
     }
 
     async registration({login, password, email}: CreateUserInputDto) {
-        const isLoginExist = await this.usersRepository.findUserByLogin(login)
+        //const isLoginExist = await this.usersRepository.findUserByLogin(login)
+        const isLoginExist = await this.usersRawRepository.findUserByLoginSQL(login)
         if (isLoginExist) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
@@ -36,7 +41,8 @@ export class AuthService {
                 ]
             })
         }
-        const isEmailExist = await this.usersRepository.findUserByEmail(email)
+        //const isEmailExist = await this.usersRepository.findUserByEmail(email)
+        const isEmailExist = await this.usersRawRepository.findUserByEmailSQL(email)
         if (isEmailExist) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
@@ -55,12 +61,14 @@ export class AuthService {
         const confirmationCode = randomUUID()
         const newUser = this.userModel.createInstance({login, passwordHash, email}, confirmationCode, expirationDate)
         await this.usersRepository.save(newUser)
+        //await this.usersRawRepository.save(newUser) //TODO
 
         this.mailer.sendEmail(email, 'Registration', 'Please, confirm registration', confirmationCode)
     }
 
     async registrationConfirmation(code: RegistrationConfirmationCode) {
         const user = await this.usersRepository.findUserByConfirmationCode(code)
+        //const user = await this.usersRawRepository.findUserByConfirmationCodeSQL(code) // TODO
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
@@ -97,7 +105,7 @@ export class AuthService {
         }
 
         user.setIsConfirmed()
-        await this.usersRepository.save(user)
+        await this.usersRepository.save(user) // TODO
     }
 
     async login({loginOrEmail, password, deviceId}: Login & { deviceId: string }): Promise<{
@@ -105,6 +113,7 @@ export class AuthService {
         refreshToken: string
     }> {
         const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail)
+        //const user = await this.usersRawRepository.findUserByLoginOrEmailSQL(loginOrEmail) //TODO
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.Unauthorized,
@@ -123,12 +132,14 @@ export class AuthService {
     }
 
     async me(userId: string) {
-        const {createdAt, id, ...rest} = await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
+        //const {createdAt, id, ...rest} = await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
+        const {createdAt, id, ...rest} = await this.usersQueryRawRepository.getByIdOrNotFoundFailSQL(userId)
         return {userId: id, ...rest}
     }
 
     async newPassword({newPassword, recoveryCode}: NewPasswordType) {
         const user = await this.usersRepository.findUserByRecoveryCode(recoveryCode)
+        //const user = await this.usersRawRepository.findUserByRecoveryCodeSQL(recoveryCode) // TODO
         if (!user) {
             throw new DomainException({code: DomainExceptionCode.NotFound, message: 'User not found'})
         }
@@ -153,12 +164,12 @@ export class AuthService {
             })
         }
         user.changePassword(passwordHash)
-        await this.usersRepository.save(user)
+        await this.usersRepository.save(user) //TODO
     }
 
     async emailConfirmationCodeResending(email: string) {
         const user = await this.usersRepository.findUserByEmail(email)
-
+        //const user = await this.usersRawRepository.findUserByEmailSQL(email)//TODO
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
@@ -187,13 +198,13 @@ export class AuthService {
         const oneHourLaterMillis = now.getTime() + (60 * 60 * 1000);
         const expirationDate = new Date(oneHourLaterMillis);
         user.updateEmailConfirmationCode(confirmationCode, expirationDate)
-        await this.usersRepository.save(user)
+        await this.usersRepository.save(user)// TODO
         await this.mailer.sendEmail(email, 'Registration', 'Please, confirm registration', confirmationCode)
     }
 
     async passwordRecovery(email: string) {
         const user = await this.usersRepository.findUserByLoginOrEmail(email)
-
+       // const user = await this.usersRawRepository.findUserByLoginOrEmailSQL(email)
         if (!user) {
             throw new DomainException({
                 code: DomainExceptionCode.BadRequest,
